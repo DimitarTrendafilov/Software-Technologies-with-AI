@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contactbook</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>Contactbook</h1>
+    <div class="actions">
+      <input id="searchInput" type="search" placeholder="Search by name, phone, email, town" />
+      <button id="addContactBtn" class="primary">Add Contact</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div id="status" class="status">Loading contacts…</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Town</th>
+              <th>Comments</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="contactsBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="contactDialog" class="modal">
+    <form id="contactForm" method="dialog">
+      <h2 id="dialogTitle">Add Contact</h2>
+      <input type="hidden" id="contactId" />
+
+      <label>
+        Name
+        <input id="nameInput" type="text" required />
+      </label>
+
+      <label>
+        Phone
+        <input id="phoneInput" type="tel" required />
+      </label>
+
+      <label>
+        Email
+        <input id="emailInput" type="email" required />
+      </label>
+
+      <label>
+        Town
+        <input id="townInput" type="text" required />
+      </label>
+
+      <label>
+        Comments
+        <textarea id="commentsInput" rows="3"></textarea>
+      </label>
+
+      <div class="modal-actions">
+        <button id="cancelBtn" type="button" class="ghost">Cancel</button>
+        <button id="saveBtn" type="submit" class="primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirmDialog" class="modal">
+    <form id="confirmForm" method="dialog">
+      <h2>Delete contact?</h2>
+      <p id="confirmText">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button id="confirmCancelBtn" type="button" class="ghost">Cancel</button>
+        <button id="confirmDeleteBtn" type="submit" class="danger">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
