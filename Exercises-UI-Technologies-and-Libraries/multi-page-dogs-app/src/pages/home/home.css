@@ -1,0 +1,27 @@
+.home-page {
+  min-height: 100%;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+}
+
+.feature-card {
+  border-radius: 10px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  background: #f8f9fa;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.btn-lg {
+  padding: 12px 30px;
+  border-radius: 25px;
+}
