@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Kenya - Where Adventure Meets Beauty</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c7a3e;
+            --secondary-color: #e74c3c;
+            --accent-color: #f39c12;
+            --dark-color: #1a1a1a;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --overlay-dark: rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* ========== Navigation ========== */
+        .navbar {
+            transition: all 0.5s ease;
+            padding: 1.2rem 0;
+            background: transparent !important;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand i {
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .navbar.scrolled .navbar-brand {
+            color: var(--primary-color) !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 500;
+            margin: 0 0.8rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navbar.scrolled .navbar-nav .nav-link {
+            color: var(--dark-color) !important;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            background: var(--primary-color);
+            color: white !important;
+            transform: translateY(-3px);
+        }
+
+        .navbar-toggler {
+            border: none;
+            padding: 0;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .navbar.scrolled .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(44, 122, 62, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* ========== Hero Section ========== */
+        #home {
+            height: 100vh;
+            background: linear-gradient(135deg, var(--overlay-dark), rgba(44, 122, 62, 0.7)),
+                        url('https://images.unsplash.com/photo-1523805009345-7448845a9e53?q=80&w=2072') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.3) 100%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .hero-content {
+            text-align: center;
+            color: white;
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            animation: fadeInDown 1.2s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-content .tagline {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            animation: fadeInUp 1.2s ease 0.3s backwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-explore {
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+            animation: fadeInUp 1.2s ease 0.6s backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-explore::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-explore:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-explore:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(231, 76, 60, 0.6);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            animation: bounce-vertical 2s infinite;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        @keyframes bounce-vertical {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, 15px); }
+        }
+
+        /* ========== Section Styling ========== */
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+            color: var(--dark-color);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+        }
+
+        /* ========== Places to Visit Section ========== */
+        #places {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .place-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+
+        .place-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .place-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .place-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .place-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+            padding: 2rem;
+            transform: translateY(60px);
+            transition: transform 0.4s ease;
+        }
+
+        .place-card:hover .place-overlay {
+            transform: translateY(0);
+        }
+
+        .place-overlay h3 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .place-overlay p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .place-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ========== Stats Section ========== */
+        .stats-section {
+            background: linear-gradient(135deg, var(--primary-color), #1e5a2d);
+            color: white;
+            padding: 4rem 0;
+            margin: 3rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        /* ========== History Section ========== */
+        #history {
+            background: white;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: auto;
+            margin-left: 5%;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: auto;
+            margin-right: 5%;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            z-index: 2;
+            box-shadow: 0 0 0 8px white;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-icon {
+            transform: translateX(-50%) rotate(360deg) scale(1.2);
+        }
+
+        .timeline-date {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .timeline-content h3 {
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            font-size: 1.6rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-color);
+            line-height: 1.7;
+        }
+
+        /* ========== Features Section ========== */
+        .features-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5rem 0;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            transition: all 0.4s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-10px);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .feature-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* ========== Footer ========== */
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-content {
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-5px) rotate(360deg);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .copyright {
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.6;
+        }
+
+        /* ========== Lottie Container ========== */
+        .lottie-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ========== Responsive Design ========== */
+        @media (max-width: 992px) {
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-icon {
+                left: 30px;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(odd) {
+                flex-direction: row;
+            }
+
+            .timeline-content {
+                width: 100%;
+                margin-left: 100px !important;
+                margin-right: 0 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content .tagline {
+                font-size: 1.2rem;
+            }
+
+            .place-card {
+                height: 350px;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .timeline-content {
+                margin-left: 70px !important;
+                padding: 1.5rem;
+            }
+        }
+
+        /* ========== Loading Animation ========== */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loader-icon {
+            font-size: 4rem;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <i class="fas fa-globe-africa loader-icon"></i>
+            <h3 class="mt-3">Loading Kenya...</h3>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <i class="fas fa-globe-africa"></i>
+                Discover Kenya
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#places">Places to Visit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#history">History</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home">
+        <div class="hero-content">
+            <h1>Discover Kenya</h1>
+            <p class="tagline">Where Adventure Meets Natural Beauty</p>
+            <button class="btn btn-explore" onclick="document.getElementById('places').scrollIntoView({behavior: 'smooth'})">
+                <span style="position: relative; z-index: 1;">
+                    <i class="fas fa-compass me-2"></i>Explore Now
+                </span>
+            </button>
+        </div>
+        <div class="scroll-indicator" onclick="document.getElementById('places').scrollIntoView({behavior: 'smooth'})">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="0">
+                    <div class="stat-item">
+                        <i class="fas fa-mountain stat-icon"></i>
+                        <span class="stat-number" data-count="60">0</span>
+                        <div class="stat-label">National Parks</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-item">
+                        <i class="fas fa-paw stat-icon"></i>
+                        <span class="stat-number" data-count="25000">0</span>
+                        <div class="stat-label">Wildlife Species</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-item">
+                        <i class="fas fa-umbrella-beach stat-icon"></i>
+                        <span class="stat-number" data-count="536">0</span>
+                        <div class="stat-label">Km Coastline</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-item">
+                        <i class="fas fa-users stat-icon"></i>
+                        <span class="stat-number" data-count="2">0</span>M+
+                        <div class="stat-label">Annual Visitors</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Places to Visit Section -->
+    <section id="places">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">Places to Visit</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Explore the most breathtaking destinations in Kenya
+                </p>
+            </div>
+
+            <div class="row">
+                <!-- Maasai Mara -->
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="0">
+                    <div class="place-card">
+                        <img src="images/Maasai-Mara.jpeg" alt="Maasai Mara National Reserve">
+                        <div class="place-overlay">
+                            <h3>Maasai Mara</h3>
+                            <p>Witness the Great Migration and experience the world's most spectacular wildlife reserve with abundant lions, elephants, and cheetahs.</p>
+                            <span class="place-badge"><i class="fas fa-paw me-1"></i>Wildlife</span>
+                            <span class="place-badge"><i class="fas fa-star me-1"></i>Must Visit</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amboseli National Park -->
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="place-card">
+                        <img src="images/Amboseli-National-Park.jpeg" alt="Amboseli National Park">
+                        <div class="place-overlay">
+                            <h3>Amboseli National Park</h3>
+                            <p>Famous for its large elephant herds and stunning views of Mount Kilimanjaro, Africa's highest peak.</p>
+                            <span class="place-badge"><i class="fas fa-mountain me-1"></i>Mountain Views</span>
+                            <span class="place-badge"><i class="fas fa-camera me-1"></i>Photography</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mount Kenya -->
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="place-card">
+                        <img src="images/Mount-Kenya.jpeg" alt="Mount Kenya">
+                        <div class="place-overlay">
+                            <h3>Mount Kenya</h3>
+                            <p>Africa's second-highest mountain offers incredible hiking trails, glaciers, and diverse ecosystems.</p>
+                            <span class="place-badge"><i class="fas fa-hiking me-1"></i>Adventure</span>
+                            <span class="place-badge"><i class="fas fa-snowflake me-1"></i>Glaciers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diani Beach -->
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="place-card">
+                        <img src="images/Diani-beach.jpeg" alt="Diani Beach">
+                        <div class="place-overlay">
+                            <h3>Diani Beach</h3>
+                            <p>Pristine white sandy beaches with crystal-clear turquoise waters perfect for swimming, diving, and relaxation.</p>
+                            <span class="place-badge"><i class="fas fa-umbrella-beach me-1"></i>Beach</span>
+                            <span class="place-badge"><i class="fas fa-water me-1"></i>Diving</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lake Nakuru -->
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="place-card">
+                        <img src="images/Lake-Nakuru.jpeg" alt="Lake Nakuru">
+                        <div class="place-overlay">
+                            <h3>Lake Nakuru</h3>
+                            <p>Famous for millions of pink flamingos and diverse wildlife including rhinos, giraffes, and leopards.</p>
+                            <span class="place-badge"><i class="fas fa-dove me-1"></i>Bird Watching</span>
+                            <span class="place-badge"><i class="fas fa-binoculars me-1"></i>Safari</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lamu Island -->
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="500">
+                    <div class="place-card">
+                        <img src="images/Lamu-Island.jpeg" alt="Lamu Island">
+                        <div class="place-overlay">
+                            <h3>Lamu Island</h3>
+                            <p>UNESCO World Heritage site with ancient Swahili architecture, no cars, and a rich cultural heritage.</p>
+                            <span class="place-badge"><i class="fas fa-landmark me-1"></i>Heritage</span>
+                            <span class="place-badge"><i class="fas fa-heart me-1"></i>Culture</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <div class="features-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title text-white" data-aos="fade-up">Why Visit Kenya?</h2>
+                <p class="section-subtitle text-white" data-aos="fade-up" data-aos-delay="100">
+                    Experience the magic of East Africa's premier destination
+                </p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4" data-aos="flip-left" data-aos-delay="0">
+                    <div class="feature-card">
+                        <div class="feature-icon">🦁</div>
+                        <h4>Big Five Safari</h4>
+                        <p>Spot lions, leopards, elephants, rhinos, and buffalos in their natural habitat.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4" data-aos="flip-left" data-aos-delay="100">
+                    <div class="feature-card">
+                        <div class="feature-icon">🏖️</div>
+                        <h4>Beach Paradise</h4>
+                        <p>Relax on pristine beaches along the stunning Indian Ocean coastline.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4" data-aos="flip-left" data-aos-delay="200">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎭</div>
+                        <h4>Rich Culture</h4>
+                        <p>Discover diverse tribes, traditions, and vibrant local communities.</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4" data-aos="flip-left" data-aos-delay="300">
+                    <div class="feature-card">
+                        <div class="feature-icon">⛰️</div>
+                        <h4>Adventure Sports</h4>
+                        <p>Enjoy hiking, climbing, diving, and countless outdoor activities.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Section -->
+    <section id="history">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up">Kenya's History</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    A journey through time - from ancient civilizations to modern independence
+                </p>
+            </div>
+
+            <div class="timeline">
+                <!-- Ancient Times -->
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">2000 BC - 1000 AD</span>
+                        <h3>Ancient Civilizations</h3>
+                        <p>Kenya has been inhabited for thousands of years. The Cushitic-speaking people from North Africa were among the first inhabitants, followed by Nilotic and Bantu migrations. Archaeological evidence shows early human settlements and tool-making dating back millions of years.</p>
+                    </div>
+                </div>
+
+                <!-- Swahili Coast -->
+                <div class="timeline-item" data-aos="fade-left">
+                    <div class="timeline-icon">
+                        <i class="fas fa-ship"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">1000 - 1500 AD</span>
+                        <h3>Swahili Coast Trade</h3>
+                        <p>The Swahili coast became a major trading hub, connecting Africa with Arabia, Persia, India, and China. Cities like Mombasa and Lamu flourished with trade in ivory, gold, and spices. The Swahili language and culture emerged from this blend of African and Arab influences.</p>
+                    </div>
+                </div>
+
+                <!-- Colonial Era -->
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-icon">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">1895 - 1963</span>
+                        <h3>British Colonial Period</h3>
+                        <p>Kenya became a British protectorate in 1895 and a crown colony in 1920. This period saw the construction of the Kenya-Uganda railway, significant European settlement, and the growth of Nairobi. The colonial era also witnessed resistance movements, most notably the Mau Mau uprising in the 1950s.</p>
+                    </div>
+                </div>
+
+                <!-- Independence -->
+                <div class="timeline-item" data-aos="fade-left">
+                    <div class="timeline-icon">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">December 12, 1963</span>
+                        <h3>Independence Day</h3>
+                        <p>Kenya gained independence from British rule, with Jomo Kenyatta becoming the first Prime Minister and later the first President. This marked the beginning of a new era of self-governance and nation-building. The country adopted "Harambee" (pulling together) as its national philosophy.</p>
+                    </div>
+                </div>
+
+                <!-- Modern Kenya -->
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-icon">
+                        <i class="fas fa-city"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">1963 - Present</span>
+                        <h3>Modern Kenya</h3>
+                        <p>Post-independence Kenya has evolved into East Africa's largest economy and a regional hub for trade, finance, and technology. Despite challenges, Kenya has made significant progress in infrastructure, education, healthcare, and technology, becoming known as the "Silicon Savannah" for its tech innovations.</p>
+                    </div>
+                </div>
+
+                <!-- Tourism Growth -->
+                <div class="timeline-item" data-aos="fade-left">
+                    <div class="timeline-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">1970s - Present</span>
+                        <h3>Tourism Industry</h3>
+                        <p>Tourism has become one of Kenya's major economic pillars. The country's diverse wildlife, stunning landscapes, and rich cultural heritage attract millions of visitors annually. Kenya has pioneered wildlife conservation efforts and sustainable tourism practices, becoming a global leader in eco-tourism.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lottie Animation Placeholder -->
+            <div class="text-center mt-5" data-aos="zoom-in">
+                <div class="lottie-container">
+                    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+                    <lottie-player 
+                        src="https://assets2.lottiefiles.com/packages/lf20_kyu7xb1v.json"
+                        background="transparent"
+                        speed="1"
+                        style="width: 100%; height: 400px;"
+                        loop
+                        autoplay>
+                    </lottie-player>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-globe-africa"></i>
+                    Discover Kenya
+                </div>
+                <p>Experience the heart of Africa</p>
+                
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-pinterest"></i></a>
+                </div>
+
+                <div class="footer-links">
+                    <a href="#home">Home</a>
+                    <a href="#places">Places</a>
+                    <a href="#history">History</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+
+                <div class="copyright">
+                    <p>&copy; 2026 Discover Kenya. Designed with <i class="fas fa-heart text-danger"></i> for Kenya Tourism</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // Page Loader
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('pageLoader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Active nav link on scroll
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scrolling for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Counter animation for stats
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-count'));
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    element.textContent = Math.ceil(current).toLocaleString();
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = target.toLocaleString();
+                }
+            };
+
+            updateCounter();
+        }
+
+        // Intersection Observer for counters
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px'
+        };
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.stat-number');
+                    counters.forEach(counter => {
+                        if (!counter.classList.contains('animated')) {
+                            counter.classList.add('animated');
+                            animateCounter(counter);
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroSection = document.getElementById('home');
+            if (heroSection && scrolled < window.innerHeight) {
+                heroSection.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Close mobile menu on link click
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (navbarCollapse.classList.contains('show')) {
+                    navbarToggler.click();
+                }
+            });
+        });
+
+        // Add loading state to images
+        const placeCards = document.querySelectorAll('.place-card img');
+        placeCards.forEach(img => {
+            img.addEventListener('load', function() {
+                this.style.opacity = '1';
+            });
+        });
+    </script>
+</body>
+</html>

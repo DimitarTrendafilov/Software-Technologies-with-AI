@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Планер</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-content">
+        <h1>Планер</h1>
+        <p>Бъдете организирани за днес, тази седмица и този месец.</p>
+        <button class="primary" id="addTaskBtn">Добави задача</button>
+      </div>
+      <div class="stats-card" aria-live="polite">
+        <h2>Напредък за днес</h2>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-fill" id="todayProgressFill"></div>
+        </div>
+        <div class="progress-meta">
+          <span id="todayProgressText">0% изпълнени</span>
+          <span id="todayProgressCount">0/0 задачи</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="board">
+        <header>
+          <h2>Днес</h2>
+          <p>Фокус върху най-важното.</p>
+        </header>
+        <ul class="task-list" id="todayList"></ul>
+      </section>
+
+      <section class="board">
+        <header>
+          <h2>Тази седмица</h2>
+          <p>Планирай следващите 7 дни.</p>
+        </header>
+        <ul class="task-list" id="weekList"></ul>
+      </section>
+
+      <section class="board">
+        <header>
+          <h2>Този месец</h2>
+          <p>Цели и ключови етапи.</p>
+        </header>
+        <ul class="task-list" id="monthList"></ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2026 Планер. Всички права запазени.</p>
+    </footer>
+
+    <div class="modal" id="taskModal" aria-hidden="true" role="dialog" aria-labelledby="taskModalTitle">
+      <div class="modal-content">
+        <button class="icon-btn" id="closeTaskModal" aria-label="Затвори модалния прозорец">×</button>
+        <h2 id="taskModalTitle">Добави задача</h2>
+        <form id="taskForm">
+          <input type="hidden" id="taskId" />
+          <label>
+            Име на задача
+            <input type="text" id="taskName" placeholder="Въведи ясна задача" required />
+          </label>
+          <label>
+            Приоритет
+            <select id="taskPriority" required>
+              <option value="Low">Нисък</option>
+              <option value="Medium" selected>Среден</option>
+              <option value="High">Висок</option>
+            </select>
+          </label>
+          <label>
+            Категория
+            <select id="taskCategory">
+              <option value="">Без</option>
+              <option value="Work">Работа</option>
+              <option value="Study">Учебни</option>
+              <option value="Personal">Лични</option>
+            </select>
+          </label>
+          <label>
+            Секция
+            <select id="taskSection" required>
+              <option value="today">Днес</option>
+              <option value="week">Тази седмица</option>
+              <option value="month">Този месец</option>
+            </select>
+          </label>
+          <button type="submit" class="primary" id="saveTaskBtn">Запази задача</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="confirmModal" aria-hidden="true" role="dialog" aria-labelledby="confirmModalTitle">
+      <div class="modal-content">
+        <h2 id="confirmModalTitle">Изтриване на задача?</h2>
+        <p>Сигурни ли сте, че искате да изтриете тази задача? Действието е необратимо.</p>
+        <div class="modal-actions">
+          <button class="ghost" id="cancelDeleteBtn">Отказ</button>
+          <button class="danger" id="confirmDeleteBtn">Изтрий</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Респонсив Йога Студио</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="logo">
+            <img src="https://via.placeholder.com/50" alt="Лого">
+        </div>
+        <h1 class="site-title">Йога Студио</h1>
+        <button class="mobile-menu-toggle" aria-label="Меню">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <nav class="header-nav">
+            <ul>
+                <li><a href="#home">Начало</a></li>
+                <li><a href="#classes">Класове</a></li>
+                <li><a href="#about">За нас</a></li>
+                <li><a href="#contact">Контакти</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Site Sidebar -->
+        <aside class="sidebar">
+            <h3>Бързи връзки</h3>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#beginner">Класове за начинаещи</a></li>
+                    <li><a href="#intermediate">Средно напреднали класове</a></li>
+                    <li><a href="#advanced">Напреднали класове</a></li>
+                    <li><a href="#schedule">График</a></li>
+                    <li><a href="#pricing">Цени</a></li>
+                    <li><a href="#instructors">Инструктори</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Site Main Body -->
+        <main class="main-content">
+            <!-- Section 1 -->
+            <section class="content-section" id="home">
+                <h2>Добре дошли в нашата Йога Студио</h2>
+                <article class="article">
+                    <h3>Намерете вашия баланс</h3>
+                    <p>Открийте трансформиращата сила на йогата в нашето гостоприемно студио. Независимо дали сте начинаещ или опитен практикуващ, имаме класове, съобразени с вашите нужди.</p>
+                    <p>Нашите опитни инструктори ви водят през всяка поза с грижа и внимание, помагайки ви да изградите сила, гъвкавост и вътрешен мир.</p>
+                </article>
+                <article class="article">
+                    <h3>Ум, Тяло, Дух</h3>
+                    <p>Йогата е повече от физическо упражнение. Това е холистична практика, която храни цялото ви същество, насърчавайки умствената яснота и емоционалния баланс.</p>
+                </article>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="content-section" id="classes">
+                <h2>Нашите класове</h2>
+                <article class="article">
+                    <h3>Хатха Йога</h3>
+                    <p>Нежно въведение в най-основните йога пози. Перфектна за начинаещи и тези, които търсят по-бавна практика.</p>
+                </article>
+                <article class="article">
+                    <h3>Виняса Флоу</h3>
+                    <p>Динамични последователности, които свързват дишането с движението. Чудесна за изграждане на сила и издръжливост, докато се движите през позите.</p>
+                </article>
+                <article class="article">
+                    <h3>Възстановителна Йога</h3>
+                    <p>Дълбоко релаксираща практика, използваща реквизити за подкрепа на тялото в спокойни пози, насърчаваща изцелението и облекчението на стреса.</p>
+                </article>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="content-section" id="about">
+                <h2>За нас</h2>
+                <article class="article">
+                    <h3>Нашата история</h3>
+                    <p>Основано през 2020 г., нашето студио се превърна в убежище за тези, които търсят благополучие и общност. Вярваме, че йогата е за всеки, независимо от възраст, ниво на физическа подготовка или опит.</p>
+                    <p>Нашата мисия е да създадем приобщаващо пространство, където учениците могат да изследват своята практика, да се свържат с другите и да открият вътрешната си сила.</p>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p class="copyright">&copy; 2026 Йога Студио. Всички права запазени.</p>
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="#privacy">Политика за поверителност</a></li>
+                    <li><a href="#terms">Условия за ползване</a></li>
+                    <li><a href="#contact">Свържете се с нас</a></li>
+                    <li><a href="#sitemap">Карта на сайта</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const headerNav = document.querySelector('.header-nav');
+        
+        mobileMenuToggle.addEventListener('click', function() {
+            this.classList.toggle('active');
+            headerNav.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+        });
+
+        // Close menu when clicking on a link
+        const navLinks = document.querySelectorAll('.header-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenuToggle.classList.remove('active');
+                headerNav.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dogs Breeds - Explore Your Perfect Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f39c12 !important;
+        }
+
+        nav.navbar {
+            background-color: #2c3e50;
+        }
+
+        nav.navbar .nav-link {
+            color: white !important;
+            margin-left: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        nav.navbar .nav-link:hover {
+            color: #f39c12 !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 120px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .btn-primary {
+            background-color: #f39c12;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .hero .btn-primary:hover {
+            background-color: #e67e22;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Featured Breeds Section */
+        .featured-section {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background-color: #f39c12;
+            border-radius: 2px;
+        }
+
+        /* Carousel */
+        .carousel-item {
+            padding: 20px;
+        }
+
+        .carousel-inner {
+            background-color: white;
+            border-radius: 10px;
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(44, 62, 80, 0.9);
+            border-radius: 50%;
+            background-size: 55% 55%;
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 8%;
+            opacity: 1;
+        }
+
+        /* Breed Card */
+        .breed-card {
+            background: white;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .breed-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .breed-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .breed-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .breed-card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .breed-card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .breed-card-text {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .breed-card .btn {
+            background-color: #667eea;
+            border: none;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .breed-card .btn:hover {
+            background-color: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        /* All Breeds Section */
+        .all-breeds-section {
+            padding: 60px 0;
+            background-color: white;
+        }
+
+        .breeds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+        }
+
+        .accordion-button {
+            background-color: #f39c12;
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #e67e22;
+            color: white;
+            box-shadow: none;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border: none;
+        }
+
+        .accordion-body {
+            color: #333;
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+        }
+
+        footer a {
+            color: #f39c12;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #e67e22;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .breeds-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .text-muted {
+            color: #999 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-lg">
+                <a class="navbar-brand" href="#home">🐕 DogBreeds</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="#featured">Featured</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#all-breeds">All Breeds</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container-lg">
+                <h1>Discover Your Perfect Dog Breed</h1>
+                <p>Explore our comprehensive collection of dog breeds and find your ideal companion</p>
+                <a href="#all-breeds" class="btn btn-primary">Explore Breeds</a>
+            </div>
+        </section>
+
+        <!-- Featured Breeds Section -->
+        <section class="featured-section" id="featured">
+            <div class="container-lg">
+                <h2 class="section-title">Featured Breeds</h2>
+                <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner" id="carouselContent">
+                        <!-- Carousel items will be dynamically inserted here -->
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- All Breeds Section -->
+        <section class="all-breeds-section" id="all-breeds">
+            <div class="container-lg">
+                <h2 class="section-title">All Breeds</h2>
+                <div class="breeds-grid" id="breedsGrid">
+                    <!-- Cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section" id="faq">
+            <div class="container-lg">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                How do I choose the right dog breed for my lifestyle?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                When choosing a dog breed, consider your living situation (apartment vs. house), activity level, available time for exercise and grooming, and family members' needs. Different breeds have different energy levels, sizes, and temperaments. It's important to research the breed's characteristics and ensure they align with your lifestyle.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                What's the average lifespan of a dog?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                The average lifespan of a dog is typically between 10-13 years, but this varies significantly by breed. Smaller breeds tend to live longer (12-18 years), while larger breeds have shorter lifespans (7-10 years). Proper care, nutrition, and regular veterinary checkups can help extend your dog's life.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                How much exercise do dogs need daily?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Most dogs need 30 minutes to 2 hours of exercise per day, depending on the breed and age. High-energy breeds like Border Collies and Huskies need more exercise, while low-energy breeds like Bulldogs need less. Regular walks, playtime, and mental stimulation are all important for your dog's health and happiness.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                What should I feed my dog?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                A balanced diet with high-quality proteins, healthy fats, and essential nutrients is crucial for your dog's health. Consult with your veterinarian to determine the best diet based on your dog's age, size, activity level, and health condition. Commercial dog food, home-prepared meals, or a combination can all be appropriate depending on your dog's needs.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                How often should I groom my dog?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Grooming frequency depends on your dog's breed and coat type. Short-haired dogs may need grooming every 4-6 weeks, while long-haired breeds might need weekly grooming. Regular brushing, nail trimming, ear cleaning, and dental care are important for maintaining your dog's health and hygiene.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container-lg">
+            <p>&copy; 2026 DogBreeds. All rights reserved.</p>
+            <p>Email: <a href="mailto:info@dogbreeds.com">info@dogbreeds.com</a> | Phone: <a href="tel:+1234567890">(123) 456-7890</a></p>
+            <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Breed Data Array with Wikipedia links
+        const breedsData = [
+            {
+                id: 1,
+                name: "Golden Retriever",
+                image: "images/golden-retriever.jpg",
+                description: "Golden Retrievers are friendly, intelligent, and devoted dogs. They're excellent family pets and are known for their beautiful golden coats and gentle nature.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Golden_Retriever"
+            },
+            {
+                id: 2,
+                name: "German Shepherd",
+                image: "images/german-shepherd.jpg",
+                description: "German Shepherds are intelligent, versatile, and confident dogs. They're often used as working dogs and are known for their loyalty and protective nature.",
+                wikiUrl: "https://en.wikipedia.org/wiki/German_Shepherd"
+            },
+            {
+                id: 3,
+                name: "Labrador Retriever",
+                image: "images/labrador-retriever.jpg",
+                description: "Labradors are outgoing, even-tempered, and friendly dogs. They're one of the most popular breeds and make excellent family companions and service dogs.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Labrador_Retriever"
+            },
+            {
+                id: 4,
+                name: "French Bulldog",
+                image: "images/french-bulldog.jpg",
+                description: "French Bulldogs are small, muscular dogs with distinctive bat ears. They're affectionate, playful, and adaptable, making them great for apartment living.",
+                wikiUrl: "https://en.wikipedia.org/wiki/French_Bulldog"
+            },
+            {
+                id: 5,
+                name: "Siberian Husky",
+                image: "images/siberian-husky.jpg",
+                description: "Huskies are energetic, friendly, and striking dogs with beautiful blue eyes. They're excellent for active families and love cold weather.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Siberian_Husky"
+            },
+            {
+                id: 6,
+                name: "Poodle",
+                image: "images/poodle.jpg",
+                description: "Poodles are highly intelligent and athletic dogs available in three sizes. They're known for their hypoallergenic coats and excellent training abilities.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Poodle"
+            },
+            {
+                id: 7,
+                name: "Bulldog",
+                image: "images/bulldog.jpg",
+                description: "Bulldogs are medium-sized, muscular dogs with a wrinkled face and stocky build. They're gentle, affectionate, and require minimal exercise.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Bulldog"
+            },
+            {
+                id: 8,
+                name: "Beagle",
+                image: "images/beagle.jpg",
+                description: "Beagles are small, sturdy hound dogs with excellent scenting abilities. They're curious, merry, and make wonderful family pets with loving personalities.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Beagle"
+            },
+            {
+                id: 9,
+                name: "Dachshund",
+                image: "images/dachshund.jpg",
+                description: "Dachshunds are small, long-bodied dogs with short legs. They're clever, lively, and surprisingly athletic, making them excellent companions.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Dachshund"
+            },
+            {
+                id: 10,
+                name: "Rottweiler",
+                image: "images/rottweiler.jpg",
+                description: "Rottweilers are strong, confident dogs with a calm temperament. They're loyal, obedient, and make excellent guard dogs and family pets.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Rottweiler"
+            },
+            {
+                id: 11,
+                name: "Boxer",
+                image: "images/boxer.jpg",
+                description: "Boxers are energetic, playful, and loyal dogs with a distinctive square jaw. They're excellent family pets and love being part of the action.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Boxer_(dog)"
+            },
+            {
+                id: 12,
+                name: "Yorkshire Terrier",
+                image: "images/yorkshire-terrier.jpg",
+                description: "Yorkshire Terriers are small, silky-coated dogs with big personalities. They're affectionate, sprightly, and perfect for those wanting a small companion.",
+                wikiUrl: "https://en.wikipedia.org/wiki/Yorkshire_Terrier"
+            }
+        ];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCarousel();
+            renderAllBreeds();
+        });
+
+        // Render Featured Breeds Carousel
+        function renderCarousel() {
+            const carouselContent = document.getElementById('carouselContent');
+            const featuredBreeds = breedsData.slice(0, 5); // Use first 5 breeds for carousel
+
+            featuredBreeds.forEach((breed, index) => {
+                const isActive = index === 0 ? 'active' : '';
+                const carouselItem = document.createElement('div');
+                carouselItem.className = `carousel-item ${isActive}`;
+                carouselItem.innerHTML = `
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <img src="${breed.image}" alt="${breed.name}" class="img-fluid rounded" style="max-height: 400px; object-fit: cover;">
+                        </div>
+                        <div class="col-md-6">
+                            <h3 style="color: #2c3e50; font-size: 2rem; font-weight: bold;">${breed.name}</h3>
+                            <p style="color: #666; font-size: 1.1rem; line-height: 1.8;">${breed.description}</p>
+                            <button class="btn btn-primary" onclick="scrollToBreed(${breed.id})">Learn More</button>
+                        </div>
+                    </div>
+                `;
+                carouselContent.appendChild(carouselItem);
+            });
+        }
+
+        // Render All Breeds Cards
+        function renderAllBreeds() {
+            const breedsGrid = document.getElementById('breedsGrid');
+            breedsGrid.innerHTML = ''; // Clear existing content
+
+            breedsData.forEach(breed => {
+                const card = document.createElement('div');
+                card.className = 'breed-card';
+                card.innerHTML = `
+                    <img src="${breed.image}" alt="${breed.name}" class="card-img-top">
+                    <div class="breed-card-body">
+                        <h5 class="breed-card-title">${breed.name}</h5>
+                        <p class="breed-card-text">${breed.description}</p>
+                        <button class="btn btn-sm" onclick="viewBreedDetails(${breed.id})">Learn More</button>
+                    </div>
+                `;
+                breedsGrid.appendChild(card);
+            });
+        }
+
+        // Function to scroll to a specific breed
+        function scrollToBreed(breedId) {
+            const breed = breedsData.find(b => b.id === breedId);
+            const allBreedSection = document.getElementById('all-breeds');
+            allBreedSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Function to view breed details - opens Wikipedia page
+        function viewBreedDetails(breedId) {
+            const breed = breedsData.find(b => b.id === breedId);
+            window.open(breed.wikiUrl, '_blank');
+        }
+    </script>
+</body>
+</html>

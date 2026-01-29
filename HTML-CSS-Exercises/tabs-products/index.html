@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Слушалки - Продуктова страница</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="product-header">
+            <img src="https://via.placeholder.com/300x300/333/fff?text=Слушалки" alt="Слушалки" class="product-image">
+            <div class="product-summary">
+                <h1>Безжични слушалки Premium</h1>
+                <p class="price">299.99 лв</p>
+                <button class="buy-button">Купи сега</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="info">Информация</button>
+            <button class="tab-button" data-tab="specs">Спецификации</button>
+            <button class="tab-button" data-tab="reviews">Отзиви</button>
+        </div>
+
+        <div class="tab-content">
+            <div id="info" class="tab-panel active">
+                <h2>Информация за продукта</h2>
+                <p>Насладете се на изключително качество на звука с нашите премиум безжични слушалки. Разработени с най-новата технология за шумопотискане, те осигуряват кристално чист звук и максимален комфорт.</p>
+                <ul>
+                    <li>Активно шумопотискане (ANC)</li>
+                    <li>До 30 часа работа на батерията</li>
+                    <li>Бързо зареждане - 5 минути за 2 часа музика</li>
+                    <li>Удобна ергономична конструкция</li>
+                    <li>Висококачествени материали</li>
+                </ul>
+            </div>
+
+            <div id="specs" class="tab-panel">
+                <h2>Технически спецификации</h2>
+                <table class="specs-table">
+                    <tr>
+                        <td>Тип</td>
+                        <td>Безжични слушалки с оголовие</td>
+                    </tr>
+                    <tr>
+                        <td>Bluetooth</td>
+                        <td>5.2</td>
+                    </tr>
+                    <tr>
+                        <td>Честотен диапазон</td>
+                        <td>20Hz - 20kHz</td>
+                    </tr>
+                    <tr>
+                        <td>Импеданс</td>
+                        <td>32 Ω</td>
+                    </tr>
+                    <tr>
+                        <td>Време за работа</td>
+                        <td>До 30 часа (ANC изкл.), 20 часа (ANC вкл.)</td>
+                    </tr>
+                    <tr>
+                        <td>Време за зареждане</td>
+                        <td>2 часа</td>
+                    </tr>
+                    <tr>
+                        <td>Тегло</td>
+                        <td>250 грама</td>
+                    </tr>
+                    <tr>
+                        <td>Цвят</td>
+                        <td>Черен</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="reviews" class="tab-panel">
+                <h2>Отзиви от клиенти</h2>
+                <div class="review">
+                    <div class="review-header">
+                        <strong>Иван П.</strong>
+                        <span class="rating">★★★★★</span>
+                    </div>
+                    <p>Невероятни слушалки! Звукът е кристално чист, а батерията наистина издържа цял ден. Препоръчвам ги на всички!</p>
+                </div>
+                <div class="review">
+                    <div class="review-header">
+                        <strong>Мария Д.</strong>
+                        <span class="rating">★★★★☆</span>
+                    </div>
+                    <p>Много съм доволна от покупката. Шумопотискането работи отлично. Единственият минус е, че са малко тежки за дълго носене.</p>
+                </div>
+                <div class="review">
+                    <div class="review-header">
+                        <strong>Георги С.</strong>
+                        <span class="rating">★★★★★</span>
+                    </div>
+                    <p>Отлично съотношение цена-качество. Използвам ги всеки ден за работа и са идеални за онлайн срещи.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

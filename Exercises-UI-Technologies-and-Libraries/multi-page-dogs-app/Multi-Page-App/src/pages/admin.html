@@ -1,0 +1,123 @@
+<div class="container-fluid py-5">
+  <div class="row mb-4">
+    <div class="col">
+      <h1>Admin Dashboard</h1>
+      <p class="text-muted">Manage dog listings in the marketplace</p>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-success btn-lg" id="addNewDogBtn">+ Add New Dog</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Breed</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Purpose</th>
+          <th>Price</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="dogsTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Add/Edit Dog Modal -->
+  <div class="modal fade" id="dogFormModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Add New Dog</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="dogForm">
+            <input type="hidden" id="dogId">
+
+            <div class="mb-3">
+              <label for="dogName" class="form-label">Name</label>
+              <input type="text" class="form-control" id="dogName" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="dogBreed" class="form-label">Breed</label>
+              <input type="text" class="form-control" id="dogBreed" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="dogAge" class="form-label">Age (years)</label>
+              <input type="number" class="form-control" id="dogAge" min="0" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="dogGender" class="form-label">Gender</label>
+              <select class="form-select" id="dogGender" required>
+                <option value="">Select an option</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="dogDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="dogDescription" rows="4" required></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="dogImage" class="form-label">Image URL</label>
+              <input type="url" class="form-control" id="dogImage" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="purpose" class="form-label">Purpose</label>
+              <select class="form-select" id="purpose" required>
+                <option value="">Select an option</option>
+                <option value="adoption">Adoption (Free)</option>
+                <option value="sale">For Sale</option>
+              </select>
+            </div>
+
+            <div class="mb-3" id="priceField" style="display: none;">
+              <label for="dogPrice" class="form-label">Price ($)</label>
+              <input type="number" class="form-control" id="dogPrice" min="0" step="0.01">
+            </div>
+
+            <div class="mb-0">
+              <img id="imagePreview" class="img-fluid rounded" style="max-height: 200px; display: none;" alt="Preview">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveDogBtn">Save Dog</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Confirm Deletion</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete <strong id="deleteDogName"></strong>?</p>
+          <p class="text-muted">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

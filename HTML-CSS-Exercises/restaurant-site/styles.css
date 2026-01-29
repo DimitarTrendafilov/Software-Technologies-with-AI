@@ -1,0 +1,200 @@
+/* Simple, clean styling for the restaurant site */
+:root {
+    --bg: #f7f5ef;
+    --surface: #ffffff;
+    --text: #1f262e;
+    --muted: #5b6570;
+    --accent: #c96b3c;
+    --border: #e2dfd7;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    --radius: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.brand {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+
+.nav {
+    display: flex;
+    gap: 12px;
+}
+
+.nav a {
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: var(--muted);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav a:hover {
+    background: var(--border);
+    color: var(--text);
+}
+
+.nav a.active {
+    background: var(--text);
+    color: #ffffff;
+}
+
+.content {
+    width: min(1100px, 92%);
+    margin: 28px auto 40px;
+    flex: 1;
+}
+
+.content.narrow {
+    width: min(820px, 92%);
+}
+
+.hero {
+    background: linear-gradient(135deg, #f2e6da, #ffffff);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+}
+
+.hero h1 {
+    font-size: 1.9rem;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: var(--muted);
+    margin-bottom: 16px;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 16px;
+    background: var(--accent);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 12px rgba(201, 107, 60, 0.35);
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+}
+
+.card h2 {
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+}
+
+.card p {
+    color: var(--muted);
+}
+
+.highlight {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-top: 18px;
+}
+
+.highlight ul {
+    list-style: disc;
+    margin-left: 20px;
+    color: var(--muted);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.contact-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-top: 18px;
+}
+
+form {
+    display: grid;
+    gap: 10px;
+}
+
+label {
+    font-weight: 600;
+}
+
+input,
+textarea {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font: inherit;
+    background: #fff;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.footer {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    text-align: center;
+    padding: 14px 0;
+    color: var(--muted);
+}

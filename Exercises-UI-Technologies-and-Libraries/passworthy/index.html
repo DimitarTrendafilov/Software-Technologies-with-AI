@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassWorthy - Strong Password Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">PassWorthy</div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#" class="nav-link active" data-page="home">Home</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-page="test">Password Test</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-page="about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <section id="home" class="page active">
+        <div class="container">
+            <div class="card">
+                <h1 class="title">Generate Strong Passwords</h1>
+                <p class="subtitle">Create secure, random passwords to protect your accounts</p>
+
+                <div class="password-input-group">
+                    <input type="text" id="passwordOutput" class="password-input" placeholder="Your password will appear here" readonly>
+                    <button id="copyBtn" class="copy-btn" title="Copy password">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="length-control">
+                    <label for="passwordLength">Password Length: <span id="lengthValue">19</span></label>
+                    <input type="range" id="passwordLength" min="4" max="50" value="19">
+                </div>
+
+                <div class="options-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="useUppercase" checked>
+                        <span class="checkmark"></span>
+                        <span>Uppercase Letters (A-Z)</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="useLowercase" checked>
+                        <span class="checkmark"></span>
+                        <span>Lowercase Letters (a-z)</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="useNumbers" checked>
+                        <span class="checkmark"></span>
+                        <span>Numbers (0-9)</span>
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="useSymbols" checked>
+                        <span class="checkmark"></span>
+                        <span>Symbols (!@#$%^&*)</span>
+                    </label>
+                </div>
+
+                <button id="generateBtn" class="generate-btn">Generate Password</button>
+
+                <div id="generatedPasswords" class="passwords-history">
+                    <h3>Generated Passwords</h3>
+                    <ul id="passwordsList" class="passwords-list"></ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Password Test Page -->
+    <section id="test" class="page">
+        <div class="container">
+            <div class="card">
+                <h1 class="title">Test Password Strength</h1>
+                <p class="subtitle">Check how strong your password is</p>
+
+                <div class="password-input-group">
+                    <input type="password" id="testPasswordInput" class="password-input" placeholder="Enter a password to test">
+                    <button id="toggleVisibility" class="toggle-visibility-btn" title="Toggle visibility">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="strength-meter">
+                    <div class="strength-bar" id="strengthBar"></div>
+                </div>
+                <p class="strength-text">Strength: <span id="strengthLabel">No password</span></p>
+
+                <div class="criteria-checklist">
+                    <h3>Password Requirements</h3>
+                    <label class="criteria-item">
+                        <input type="checkbox" id="criteriaLength" disabled>
+                        <span class="criteria-checkmark"></span>
+                        <span>At least 8 characters</span>
+                    </label>
+                    <label class="criteria-item">
+                        <input type="checkbox" id="criteriaUppercase" disabled>
+                        <span class="criteria-checkmark"></span>
+                        <span>Contains uppercase letters</span>
+                    </label>
+                    <label class="criteria-item">
+                        <input type="checkbox" id="criteriaLowercase" disabled>
+                        <span class="criteria-checkmark"></span>
+                        <span>Contains lowercase letters</span>
+                    </label>
+                    <label class="criteria-item">
+                        <input type="checkbox" id="criteriaNumbers" disabled>
+                        <span class="criteria-checkmark"></span>
+                        <span>Contains numbers</span>
+                    </label>
+                    <label class="criteria-item">
+                        <input type="checkbox" id="criteriaSymbols" disabled>
+                        <span class="criteria-checkmark"></span>
+                        <span>Contains symbols</span>
+                    </label>
+                </div>
+
+                <div id="testHistory" class="passwords-history">
+                    <h3>Test History</h3>
+                    <ul id="testList" class="passwords-list"></ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Page -->
+    <section id="about" class="page">
+        <div class="container">
+            <div class="card about-card">
+                <h1 class="title">About PassWorthy</h1>
+                
+                <h2>How to Create Strong Passwords</h2>
+                
+                <h3>Why Strong Passwords Matter</h3>
+                <p>A strong password is your first line of defense against cybercriminals and unauthorized access to your accounts. With the increase in data breaches and online threats, having a robust password is essential for protecting your personal and sensitive information.</p>
+
+                <h3>Characteristics of a Strong Password</h3>
+                <ul>
+                    <li><strong>Length:</strong> Aim for at least 12-16 characters. The longer your password, the harder it is to crack using brute-force attacks.</li>
+                    <li><strong>Mix of Character Types:</strong> Use uppercase letters (A-Z), lowercase letters (a-z), numbers (0-9), and symbols (!@#$%^&*). This increases complexity significantly.</li>
+                    <li><strong>Avoid Common Words:</strong> Don't use dictionary words, names, or dates that are easy to guess. Avoid personal information like birthdates or names of family members.</li>
+                    <li><strong>No Sequential Patterns:</strong> Avoid consecutive letters or numbers (like "abc123" or "qwerty") as these are commonly tested in attacks.</li>
+                    <li><strong>Unique:</strong> Use different passwords for different accounts. If one password is compromised, it won't affect your other accounts.</li>
+                </ul>
+
+                <h3>Tips for Creating Strong Passwords</h3>
+                <ol>
+                    <li><strong>Use a Random Generator:</strong> Our password generator creates truly random passwords that meet all security requirements.</li>
+                    <li><strong>Create a Passphrase:</strong> Combine 4-5 random words (like "BlueSunsetMountainDream2024") which is both strong and memorable.</li>
+                    <li><strong>Substitute Characters:</strong> Replace letters with similar-looking numbers or symbols (like 'a' with '@', 'l' with '1', 's' with '$').</li>
+                    <li><strong>Use a Password Manager:</strong> Store complex passwords securely in a password manager rather than memorizing them.</li>
+                    <li><strong>Enable Two-Factor Authentication:</strong> Add an extra layer of security with 2FA whenever available.</li>
+                </ol>
+
+                <h3>Common Password Mistakes to Avoid</h3>
+                <ul>
+                    <li>❌ Using the same password across multiple accounts</li>
+                    <li>❌ Sharing passwords via email or messaging apps</li>
+                    <li>❌ Writing passwords on sticky notes or documents</li>
+                    <li>❌ Using easily guessable information (birthdate, pet name, etc.)</li>
+                    <li>❌ Using incomplete passwords or forgetting to include symbols</li>
+                    <li>❌ Never changing passwords on compromised accounts</li>
+                </ul>
+
+                <h3>Password Examples</h3>
+                <div class="examples">
+                    <div class="example weak">
+                        <strong>Weak Password:</strong>
+                        <p>password123</p>
+                        <small>Too simple, dictionary word, predictable pattern</small>
+                    </div>
+                    <div class="example medium">
+                        <strong>Medium Password:</strong>
+                        <p>BlueSky2024</p>
+                        <small>Better mix but still has pattern, could be more complex</small>
+                    </div>
+                    <div class="example strong">
+                        <strong>Strong Password:</strong>
+                        <p>K7@mPq$9nL2#xR</p>
+                        <small>Random, diverse character types, sufficient length</small>
+                    </div>
+                </div>
+
+                <h3>Stay Safe Online</h3>
+                <p>Remember, a strong password is just the beginning of good cybersecurity practice. Always:</p>
+                <ul>
+                    <li>Keep your software and operating system updated</li>
+                    <li>Be cautious of phishing attempts and suspicious emails</li>
+                    <li>Use secure, trusted networks (avoid public WiFi for sensitive tasks)</li>
+                    <li>Regularly review your account activity and security settings</li>
+                    <li>Report suspicious activity immediately</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>

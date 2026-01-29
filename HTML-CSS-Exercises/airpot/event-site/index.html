@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация за Събитие</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-option,
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="radio"],
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .radio-option label,
+        .checkbox-option label {
+            margin-bottom: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Годишна сбирка на ловци и риболовци</h1>
+        
+        <form action="#" method="post">
+            <!-- Full Name -->
+            <div class="form-group">
+                <label for="fullname">Пълно Име</label>
+                <input type="text" id="fullname" name="fullname" required>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Имейл</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <!-- Attendance -->
+            <div class="form-group">
+                <label>Присъствие</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="in-person" name="attendance" value="in-person" required>
+                        <label for="in-person">Присъствено</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="virtual" name="attendance" value="virtual">
+                        <label for="virtual">Онлайн</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workshops -->
+            <div class="form-group">
+                <label>Семинари</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="hunting-techniques" name="workshops" value="hunting-techniques">
+                        <label for="hunting-techniques">Ловни техники и тактики</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="fishing-methods" name="workshops" value="fishing-methods">
+                        <label for="fishing-methods">Методи за риболов</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="wildlife-conservation" name="workshops" value="wildlife-conservation">
+                        <label for="wildlife-conservation">Опазване на дивата природа</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meal Preference -->
+            <div class="form-group">
+                <label for="meal">Предпочитание за храна</label>
+                <select id="meal" name="meal" required>
+                    <option value="">-- Изберете опция --</option>
+                    <option value="standard">Стандартно</option>
+                    <option value="vegetarian">Вегетарианско</option>
+                    <option value="vegan">Веган</option>
+                    <option value="gluten-free">Безглутеново</option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">Регистрирай се</button>
+        </form>
+    </div>
+</body>
+</html>

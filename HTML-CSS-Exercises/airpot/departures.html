@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airport Departures</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #667eea;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        td {
+            padding: 15px;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .flight-no {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status.on-time {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.boarding {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.delayed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.departed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Responsive design */
+        @media screen and (min-width: 1400px) {
+            .container {
+                max-width: 1400px;
+                padding: 40px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            th, td {
+                padding: 18px;
+                font-size: 1rem;
+            }
+        }
+
+        @media screen and (max-width: 1024px) {
+            .container {
+                max-width: 95%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            body {
+                justify-content: flex-start;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            th, td {
+                padding: 12px 8px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+                margin-bottom: 5px;
+            }
+
+            .subtitle {
+                font-size: 0.8rem;
+                margin-bottom: 20px;
+            }
+
+            table {
+                min-width: 500px;
+            }
+
+            th, td {
+                padding: 10px 6px;
+                font-size: 0.75rem;
+            }
+
+            .status {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+        }
+
+        @media screen and (max-width: 360px) {
+            .container {
+                padding: 12px;
+            }
+
+            table {
+                min-width: 450px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+            }
+
+            .status {
+                font-size: 0.65rem;
+                padding: 3px 6px;
+            }
+        }
+
+        /* Landscape orientation for mobile devices */
+        @media screen and (max-height: 600px) and (orientation: landscape) {
+            body {
+                justify-content: flex-start;
+                padding: 10px;
+            }
+
+            .container {
+                margin: 10px 0;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+                margin-bottom: 5px;
+            }
+
+            .subtitle {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✈️ Departures</h1>
+        <p class="subtitle">International Airport - Live Board</p>
+        
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Flight No.</th>
+                        <th>Destination</th>
+                        <th>Departure</th>
+                        <th>Gate</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="flight-no">AA 1234</td>
+                        <td>New York (JFK)</td>
+                        <td>08:30</td>
+                        <td>A12</td>
+                        <td><span class="status boarding">Boarding</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">BA 5678</td>
+                        <td>London (LHR)</td>
+                        <td>09:15</td>
+                        <td>B7</td>
+                        <td><span class="status on-time">On Time</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">LH 9012</td>
+                        <td>Frankfurt (FRA)</td>
+                        <td>10:00</td>
+                        <td>C4</td>
+                        <td><span class="status on-time">On Time</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">AF 3456</td>
+                        <td>Paris (CDG)</td>
+                        <td>10:45</td>
+                        <td>A8</td>
+                        <td><span class="status delayed">Delayed</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">EK 7890</td>
+                        <td>Dubai (DXB)</td>
+                        <td>11:30</td>
+                        <td>D15</td>
+                        <td><span class="status on-time">On Time</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">UA 2468</td>
+                        <td>Los Angeles (LAX)</td>
+                        <td>12:00</td>
+                        <td>B3</td>
+                        <td><span class="status boarding">Boarding</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">QR 1357</td>
+                        <td>Doha (DOH)</td>
+                        <td>13:15</td>
+                        <td>C9</td>
+                        <td><span class="status on-time">On Time</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">SQ 9753</td>
+                        <td>Singapore (SIN)</td>
+                        <td>14:20</td>
+                        <td>D22</td>
+                        <td><span class="status on-time">On Time</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">TK 8642</td>
+                        <td>Istanbul (IST)</td>
+                        <td>15:00</td>
+                        <td>A15</td>
+                        <td><span class="status departed">Departed</span></td>
+                    </tr>
+                    <tr>
+                        <td class="flight-no">DL 4567</td>
+                        <td>Atlanta (ATL)</td>
+                        <td>16:30</td>
+                        <td>B11</td>
+                        <td><span class="status on-time">On Time</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
