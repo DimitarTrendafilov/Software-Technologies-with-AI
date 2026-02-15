@@ -157,10 +157,6 @@ export async function getAllUserTasks() {
     .in('stage_id', stageIds);
 
   if (tasksError) {
-    if (tasksError.message?.includes('stack depth limit exceeded')) {
-      return [];
-    }
-
     throw tasksError;
   }
 
