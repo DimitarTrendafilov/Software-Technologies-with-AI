@@ -1,4 +1,6 @@
 // Toast notification service
+import Toast from 'bootstrap/js/dist/toast';
+
 let toastContainer = null;
 
 function ensureToastContainer() {
@@ -45,7 +47,7 @@ export function showToast(message, type = 'info') {
   container.insertAdjacentHTML('beforeend', toastHtml);
   
   const toastElement = document.getElementById(toastId);
-  const bsToast = new window.bootstrap.Toast(toastElement, {
+  const bsToast = new Toast(toastElement, {
     autohide: true,
     delay: type === 'error' ? 5000 : 3000
   });
