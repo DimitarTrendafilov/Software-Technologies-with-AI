@@ -3,9 +3,26 @@ import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser } from '../../services/auth.js';
 import { getProject } from '../../services/projects.js';
 import { createTask, deleteTask, getProjectStages, getTasks, updateTask } from '../../services/tasks.js';
+import { supabase } from '../../services/supabase.js';
 import { setHidden, setText } from '../../utils/dom.js';
 import { showError } from '../../services/toast.js';
 import Modal from 'bootstrap/js/dist/modal';
+
+let activeTasksChannel = null;
+let activeProjectId = null;
+let routeCleanupListenerAttached = false;
+
+function isTaskRoute(pathname) {
+  return /^\/project\/[^/]+\/tasks$/.test(pathname) || /^\/projects\/[^/]+\/tasks$/.test(pathname);
+}
+
+function cleanupActiveTasksChannel() {
+  if (activeTasksChannel) {
+    supabase.removeChannel(activeTasksChannel);
+    activeTasksChannel = null;
+    activeProjectId = null;
+  }
+}
 
 export async function render(params) {
   const html = await loadHtml(new URL('./project-tasks.html', import.meta.url));
@@ -17,7 +34,9 @@ export async function render(params) {
         stages: [],
         tasksByStage: new Map(),
         deleteTaskId: null,
-        drag: null
+        drag: null,
+        realtimeReloadTimer: null,
+        isReloadingTasks: false
       };
 
       const title = document.querySelector('[data-project-title]');
@@ -108,9 +127,33 @@ export async function render(params) {
       };
 
       const reloadTasks = async () => {
-        const tasksByStage = await Promise.all(state.stages.map((stage) => getTasks(stage.id)));
-        state.tasksByStage = new Map(state.stages.map((stage, index) => [stage.id, tasksByStage[index] ?? []]));
-        renderBoard();
+        if (state.isReloadingTasks) {
+          return;
+        }
+
+        state.isReloadingTasks = true;
+        try {
+          const tasksByStage = await Promise.all(state.stages.map((stage) => getTasks(stage.id)));
+          state.tasksByStage = new Map(state.stages.map((stage, index) => [stage.id, tasksByStage[index] ?? []]));
+          renderBoard();
+        } finally {
+          state.isReloadingTasks = false;
+        }
+      };
+
+      const scheduleRealtimeReload = () => {
+        if (state.realtimeReloadTimer) {
+          window.clearTimeout(state.realtimeReloadTimer);
+        }
+
+        state.realtimeReloadTimer = window.setTimeout(async () => {
+          state.realtimeReloadTimer = null;
+          try {
+            await reloadTasks();
+          } catch (error) {
+            showInlineError(error?.message ?? 'Unable to refresh tasks.');
+          }
+        }, 150);
       };
 
       const saveStageTasks = async (stageId) => {
@@ -256,6 +299,39 @@ export async function render(params) {
         }
 
         await reloadTasks();
+
+        if (activeTasksChannel && activeProjectId !== params.id) {
+          cleanupActiveTasksChannel();
+        }
+
+        if (!activeTasksChannel) {
+          const stageIds = new Set(state.stages.map((stage) => stage.id));
+          activeTasksChannel = supabase
+            .channel(`project-tasks-live:${params.id}`)
+            .on(
+              'postgres_changes',
+              { event: '*', schema: 'public', table: 'tasks' },
+              (payload) => {
+                const newStageId = payload.new?.stage_id;
+                const oldStageId = payload.old?.stage_id;
+
+                if (stageIds.has(newStageId) || stageIds.has(oldStageId)) {
+                  scheduleRealtimeReload();
+                }
+              }
+            )
+            .subscribe();
+          activeProjectId = params.id;
+        }
+
+        if (!routeCleanupListenerAttached) {
+          window.addEventListener('popstate', () => {
+            if (!isTaskRoute(window.location.pathname)) {
+              cleanupActiveTasksChannel();
+            }
+          });
+          routeCleanupListenerAttached = true;
+        }
 
         setHidden(boardScroll, false);
       } catch (error) {
