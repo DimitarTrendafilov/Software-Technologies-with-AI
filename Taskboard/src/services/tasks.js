@@ -126,29 +126,39 @@ export async function getAllUserTasks() {
     return [];
   }
 
-  // Get all tasks for projects owned by the user
-  const { data, error } = await supabase
-    .from('tasks')
-    .select(`
-      id,
-      title,
-      description,
-      done,
-      created_at,
-      updated_at,
-      stage_id,
-      project_stages!inner (
-        project_id,
-        projects!inner (
-          owner_id
-        )
-      )
-    `)
-    .eq('project_stages.projects.owner_id', userData.user.id);
+  // Get all projects owned by the user
+  const { data: projects, error: projectsError } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('owner_id', userData.user.id);
 
-  if (error) {
-    throw error;
+  if (projectsError || !projects || projects.length === 0) {
+    return [];
   }
 
-  return data ?? [];
+  const projectIds = projects.map(p => p.id);
+
+  // Get all stages for these projects
+  const { data: stages, error: stagesError } = await supabase
+    .from('project_stages')
+    .select('id')
+    .in('project_id', projectIds);
+
+  if (stagesError || !stages || stages.length === 0) {
+    return [];
+  }
+
+  const stageIds = stages.map(s => s.id);
+
+  // Get all tasks for these stages
+  const { data: tasks, error: tasksError } = await supabase
+    .from('tasks')
+    .select('id, title, description, done, created_at, updated_at, stage_id')
+    .in('stage_id', stageIds);
+
+  if (tasksError) {
+    throw tasksError;
+  }
+
+  return tasks ?? [];
 }
