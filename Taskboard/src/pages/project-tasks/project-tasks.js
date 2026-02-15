@@ -88,6 +88,7 @@ export async function render(params) {
       const taskLabelsList = document.querySelector('[data-task-labels-list]');
       const taskLabelsEmpty = document.querySelector('[data-task-labels-empty]');
       const filterMyTasksCheckbox = document.querySelector('[data-filter-my-tasks]');
+      const viewActivityLink = document.querySelector('[data-view-activity-link]');
       const viewDeadlinesLink = document.querySelector('[data-view-deadlines-link]');
       const manageLabelsLinks = document.querySelectorAll('[data-manage-labels-link]');
       const viewLabelsLink = document.querySelector('[data-view-labels-link]');
@@ -969,6 +970,11 @@ export async function render(params) {
       viewLabelsLink?.addEventListener('click', (event) => {
         event.preventDefault();
         window.location.href = `/projects/${params.id}/labels`;
+      });
+
+      viewActivityLink?.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.location.href = `/projects/${params.id}/activity`;
       });
 
       viewDeadlinesLink?.addEventListener('click', (event) => {

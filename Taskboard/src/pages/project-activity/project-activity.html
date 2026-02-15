@@ -1,0 +1,32 @@
+<section class="container">
+  <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="section-title display-6">Project activity</h1>
+      <p class="text-muted">Track every change made to tasks in this project.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="/projects" data-link>Back to Projects</a>
+      <a class="btn btn-outline-dark" href="/projects" data-link data-back-tasks>Back to Tasks</a>
+    </div>
+  </div>
+
+  <div class="alert alert-info d-none" role="alert" data-auth-required>
+    Sign in to view project activity.
+  </div>
+  <div class="alert alert-danger d-none" role="alert" data-activity-error></div>
+
+  <div class="activity-filters" data-activity-filters>
+    <button class="btn btn-outline-secondary btn-sm is-active" type="button" data-activity-filter="all">All</button>
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-activity-filter="task">Tasks</button>
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-activity-filter="comment">Comments</button>
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-activity-filter="checklist">Checklist</button>
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-activity-filter="label">Labels</button>
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-activity-filter="attachment">Attachments</button>
+  </div>
+
+  <div class="activity-list" data-activity-list></div>
+  <div class="empty-state d-none" data-empty-state>
+    <h3 class="section-title h6">No activity yet</h3>
+    <p class="text-muted">Changes to tasks will appear here.</p>
+  </div>
+</section>
