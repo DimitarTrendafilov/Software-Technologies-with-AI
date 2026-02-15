@@ -2,3 +2,8 @@
 .table th {
   vertical-align: middle;
 }
+
+.admin-edit-fields {
+  display: grid;
+  gap: 0.85rem;
+}
