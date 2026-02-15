@@ -3,6 +3,7 @@ import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser } from '../../services/auth.js';
 import { getProject } from '../../services/projects.js';
 import { createTask, deleteTask, getProjectStages, getTasks, updateTask } from '../../services/tasks.js';
+import { getTaskAttachmentsByTaskIds, uploadTaskAttachments } from '../../services/task-attachments.js';
 import { supabase } from '../../services/supabase.js';
 import { setHidden, setText } from '../../utils/dom.js';
 import { showError } from '../../services/toast.js';
@@ -36,7 +37,9 @@ export async function render(params) {
         deleteTaskId: null,
         drag: null,
         realtimeReloadTimer: null,
-        isReloadingTasks: false
+        isReloadingTasks: false,
+        currentUserId: null,
+        attachmentsByTaskId: new Map()
       };
 
       const title = document.querySelector('[data-project-title]');
@@ -53,6 +56,7 @@ export async function render(params) {
       const taskTitleInput = document.querySelector('#task-title');
       const taskDescriptionInput = document.querySelector('#task-description');
       const taskDoneInput = document.querySelector('#task-done');
+      const taskFilesInput = document.querySelector('[data-task-files]');
       const deleteTaskTitle = document.querySelector('[data-delete-task-title]');
       const confirmDeleteTaskBtn = document.querySelector('[data-confirm-delete-task]');
 
@@ -104,6 +108,24 @@ export async function render(params) {
                             </div>
                           </div>
                           <p class="task-card__description">${escapeHtml(task.description || 'No description.')}</p>
+                          ${(() => {
+                            const attachments = state.attachmentsByTaskId.get(task.id) ?? [];
+                            if (!attachments.length) {
+                              return '';
+                            }
+
+                            const links = attachments
+                              .map((attachment) => {
+                                if (!attachment.url) {
+                                  return `<span class="text-muted small">${escapeHtml(attachment.file_name)}</span>`;
+                                }
+
+                                return `<a class="task-card__attachment" href="${escapeHtml(attachment.url)}" target="_blank" rel="noopener noreferrer">📎 ${escapeHtml(attachment.file_name)}</a>`;
+                              })
+                              .join('');
+
+                            return `<div class="task-card__attachments">${links}</div>`;
+                          })()}
                         </article>
                       `
                   )
@@ -135,6 +157,18 @@ export async function render(params) {
         try {
           const tasksByStage = await Promise.all(state.stages.map((stage) => getTasks(stage.id)));
           state.tasksByStage = new Map(state.stages.map((stage, index) => [stage.id, tasksByStage[index] ?? []]));
+
+          const allTaskIds = Array.from(state.tasksByStage.values())
+            .flat()
+            .map((task) => task.id);
+          const attachments = await getTaskAttachmentsByTaskIds(allTaskIds);
+          state.attachmentsByTaskId = new Map();
+          attachments.forEach((attachment) => {
+            const list = state.attachmentsByTaskId.get(attachment.task_id) ?? [];
+            list.push(attachment);
+            state.attachmentsByTaskId.set(attachment.task_id, list);
+          });
+
           renderBoard();
         } finally {
           state.isReloadingTasks = false;
@@ -240,6 +274,9 @@ export async function render(params) {
         if (taskDoneInput) {
           taskDoneInput.checked = false;
         }
+        if (taskFilesInput) {
+          taskFilesInput.value = '';
+        }
         taskModal.show();
       };
 
@@ -271,6 +308,9 @@ export async function render(params) {
         if (taskDoneInput) {
           taskDoneInput.checked = Boolean(task.done);
         }
+        if (taskFilesInput) {
+          taskFilesInput.value = '';
+        }
         taskModal.show();
       };
 
@@ -284,6 +324,7 @@ export async function render(params) {
         setHidden(authRequired, false);
         return;
       }
+      state.currentUserId = user.id;
 
       try {
         const project = await getProject(params.id);
@@ -449,6 +490,7 @@ export async function render(params) {
         const taskTitle = String(taskTitleInput?.value ?? '').trim();
         const taskDescription = String(taskDescriptionInput?.value ?? '').trim();
         const done = Boolean(taskDoneInput?.checked);
+        const selectedFiles = Array.from(taskFilesInput?.files ?? []);
 
         if (!taskTitle) {
           showTaskFormError('Task title is required.');
@@ -456,6 +498,8 @@ export async function render(params) {
         }
 
         try {
+          let targetTaskId = '';
+
           if (mode === 'edit' && taskId) {
             const existingTask = (state.tasksByStage.get(stageId) ?? []).find((task) => task.id === taskId);
             await updateTask(taskId, {
@@ -464,14 +508,20 @@ export async function render(params) {
               done,
               position: existingTask?.position ?? 0
             });
+            targetTaskId = taskId;
           } else {
             const nextPosition = (state.tasksByStage.get(stageId) ?? []).length;
-            await createTask(stageId, {
+            const createdTask = await createTask(stageId, {
               title: taskTitle,
               description: taskDescription,
               done,
               position: nextPosition
             });
+            targetTaskId = createdTask.id;
+          }
+
+          if (selectedFiles.length && targetTaskId) {
+            await uploadTaskAttachments(targetTaskId, selectedFiles, state.currentUserId);
           }
 
           taskModal.hide();

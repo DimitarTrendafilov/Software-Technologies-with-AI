@@ -76,6 +76,17 @@
   font-size: 0.88rem;
 }
 
+.task-card__attachments {
+  margin-top: 0.55rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.task-card__attachment {
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+
 .add-task-btn {
   min-height: 82px;
   border: 2px dashed rgba(10, 31, 68, 0.25);
