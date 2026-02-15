@@ -121,7 +121,11 @@ window.viewDogDetails = function(id) {
         <h3 class="price-tag ${dog.price === 0 ? 'free' : ''}">
           ${dog.price === 0 ? 'FREE ADOPTION' : '$' + dog.price}
         </h3>
+<<<<<<< HEAD
         <button class="btn btn-success btn-lg mt-3 w-100" onclick="window.openPurchaseForm(${dog.id})">
+=======
+        <button class="btn btn-success btn-lg mt-3 w-100">
+>>>>>>> 6f480daa881ab57703ef556d8c0a228caacc7601
           <i class="bi bi-heart-fill"></i> ${dog.purpose === 'sale' ? 'Buy Now' : 'Adopt This Dog'}
         </button>
       </div>
@@ -129,6 +133,7 @@ window.viewDogDetails = function(id) {
   `;
   modal.show();
 };
+<<<<<<< HEAD
 
 // Open purchase/adoption form
 window.openPurchaseForm = function(dogId) {
@@ -195,3 +200,5 @@ window.submitPurchaseForm = function() {
   `;
   successModal.show();
 };
+=======
+>>>>>>> 6f480daa881ab57703ef556d8c0a228caacc7601
