@@ -98,6 +98,8 @@ export async function getTasksPage(stageId, { offset = 0, limit = 30 } = {}) {
 }
 
 export async function createTask(stageId, { title, description, position, done, assigneeId }) {
+  console.log('createTask called with:', { stageId, title, assigneeId, assigneeIdType: typeof assigneeId });
+  
   const { data, error } = await supabase
     .from('tasks')
     .insert({
@@ -112,13 +114,17 @@ export async function createTask(stageId, { title, description, position, done, 
     .single();
 
   if (error) {
+    console.error('createTask error:', error);
     throw error;
   }
-
+  
+  console.log('createTask success:', data);
   return data;
 }
 
 export async function updateTask(taskId, { title, description, position, done, stageId, assigneeId }) {
+  console.log('updateTask called with:', { taskId, assigneeId, assigneeIdType: typeof assigneeId, assigneeIdUndefined: assigneeId === undefined });
+  
   const payload = {};
 
   if (title !== undefined) {
@@ -139,6 +145,8 @@ export async function updateTask(taskId, { title, description, position, done, s
   if (assigneeId !== undefined) {
     payload.assignee_id = assigneeId;
   }
+  
+  console.log('updateTask payload:', payload);
 
   const { data, error } = await supabase
     .from('tasks')
@@ -148,9 +156,11 @@ export async function updateTask(taskId, { title, description, position, done, s
     .single();
 
   if (error) {
+    console.error('updateTask error:', error);
     throw error;
   }
-
+  
+  console.log('updateTask success:', data);
   return data;
 }
 

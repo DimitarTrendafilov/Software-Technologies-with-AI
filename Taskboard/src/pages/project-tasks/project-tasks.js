@@ -70,9 +70,10 @@ export async function render(params) {
       const confirmDeleteTaskBtn = document.querySelector('[data-confirm-delete-task]');
       const taskDiscussion = document.querySelector('[data-task-discussion]');
       const taskCommentsList = document.querySelector('[data-task-comments-list]');
-      const taskCommentForm = document.querySelector('[data-task-comment-form]');
       const taskCommentInput = document.querySelector('[data-task-comment-input]');
+      const taskCommentSubmit = document.querySelector('[data-task-comment-submit]');
       const filterMyTasksCheckbox = document.querySelector('[data-filter-my-tasks]');
+      const manageTeamLink = document.querySelector('[data-manage-team-link]');
 
       const taskModal = new Modal(document.getElementById('taskFormModal'));
       const deleteModal = new Modal(document.getElementById('taskDeleteModal'));
@@ -124,13 +125,15 @@ export async function render(params) {
 
       const renderAssigneeOptions = (selectedUserId = '') => {
         if (!taskAssigneeInput) {
+          console.warn('taskAssigneeInput not found');
           return;
         }
 
+        console.log('Rendering assignee options with', state.projectUsers.length, 'users');
         const selected = String(selectedUserId ?? '');
         taskAssigneeInput.innerHTML = [
           '<option value="">Unassigned</option>',
-          ...state.projectUsers.map((entry) => {
+          ...(state.projectUsers || []).map((entry) => {
             const value = String(entry.user_id ?? '');
             const isSelected = value === selected ? ' selected' : '';
             return `<option value="${escapeHtml(value)}"${isSelected}>${escapeHtml(entry.email ?? 'Unknown user')}</option>`;
@@ -571,9 +574,16 @@ export async function render(params) {
 
         try {
           const projectUsers = await getProjectUsers(params.id);
-          state.projectUsers = projectUsers;
-          state.userEmailById = new Map(projectUsers.map((entry) => [entry.user_id, entry.email ?? 'Unknown user']));
-        } catch {
+          console.log('Loaded project users:', projectUsers);
+          state.projectUsers = projectUsers || [];
+          state.userEmailById = new Map(
+            (projectUsers || []).map((entry) => [
+              entry.user_id,
+              entry.email ?? 'Unknown user'
+            ])
+          );
+        } catch (error) {
+          console.error('Failed to load project users:', error);
           state.projectUsers = [];
           state.userEmailById = new Map();
         }
@@ -626,6 +636,11 @@ export async function render(params) {
       filterMyTasksCheckbox?.addEventListener('change', () => {
         state.filterMyTasks = filterMyTasksCheckbox.checked;
         renderBoard();
+      });
+
+      manageTeamLink?.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.location.href = `/projects/${params.id}/users`;
       });
 
       board?.addEventListener('click', async (event) => {
@@ -767,6 +782,7 @@ export async function render(params) {
       });
 
       taskForm?.addEventListener('submit', async (event) => {
+        console.log('!!! FORM SUBMIT EVENT TRIGGERED !!!');
         event.preventDefault();
         showTaskFormError('');
 
@@ -775,9 +791,28 @@ export async function render(params) {
         const taskId = String(taskIdInput?.value ?? '').trim();
         const taskTitle = String(taskTitleInput?.value ?? '').trim();
         const taskDescription = String(taskDescriptionInput?.value ?? '').trim();
-        const assigneeId = String(taskAssigneeInput?.value ?? '').trim() || null;
+        
+        // Get assignee value with detailed logging
+        const rawAssigneeValue = taskAssigneeInput?.value;
+        const selectedOption = taskAssigneeInput?.options?.[taskAssigneeInput.selectedIndex];
+        const selectedOptionValue = selectedOption?.value;
+        const assigneeId = rawAssigneeValue && String(rawAssigneeValue).trim() ? String(rawAssigneeValue).trim() : null;
+        
         const done = Boolean(taskDoneInput?.checked);
         const selectedFiles = Array.from(taskFilesInput?.files ?? []);
+        
+        console.log('=== TASK FORM SUBMIT START ===');
+        console.log('Mode:', mode);
+        console.log('taskAssigneeInput element:', taskAssigneeInput);
+        console.log('Selected index:', taskAssigneeInput?.selectedIndex);
+        console.log('Selected option:', selectedOption);
+        console.log('Selected option value:', selectedOptionValue);
+        console.log('Selected option text:', selectedOption?.text);
+        console.log('Raw assignee value from .value:', rawAssigneeValue);
+        console.log('Parsed assigneeId:', assigneeId);
+        console.log('Is assigneeId null?', assigneeId === null);
+        console.log('Is assigneeId empty string?', assigneeId === '');
+        console.log('typeof assigneeId:', typeof assigneeId);
 
         if (!taskTitle) {
           showTaskFormError('Task title is required.');
@@ -789,7 +824,8 @@ export async function render(params) {
 
           if (mode === 'edit' && taskId) {
             const existingTask = (getStageMeta(stageId)?.items ?? []).find((task) => task.id === taskId);
-            await updateTask(taskId, {
+            console.log('Updating task with assigneeId:', assigneeId);
+            const updated = await updateTask(taskId, {
               title: taskTitle,
               description: taskDescription,
               assigneeId,
@@ -797,9 +833,11 @@ export async function render(params) {
               position: existingTask?.position ?? 0,
               stageId
             });
+            console.log('Updated task result:', updated);
             targetTaskId = taskId;
           } else {
             const nextPosition = getStageMeta(stageId)?.total ?? 0;
+            console.log('Creating task with assigneeId:', assigneeId);
             const createdTask = await createTask(stageId, {
               title: taskTitle,
               description: taskDescription,
@@ -807,6 +845,7 @@ export async function render(params) {
               done,
               position: nextPosition
             });
+            console.log('Created task result:', createdTask);
             targetTaskId = createdTask.id;
           }
 
@@ -815,15 +854,21 @@ export async function render(params) {
           }
 
           taskModal.hide();
+          console.log('Task saved successfully, reloading...');
           await reloadTasks();
+          console.log('Tasks reloaded successfully');
         } catch (error) {
-          showTaskFormError(error?.message ?? 'Unable to save task.');
+          console.error('=== TASK SAVE ERROR ===');
+          console.error('Error object:', error);
+          console.error('Error message:', error?.message);
+          console.error('Error details:', JSON.stringify(error, null, 2));
+          const errorMessage = error?.message ?? 'Unable to save task.';
+          alert('Save failed: ' + errorMessage);
+          showTaskFormError(errorMessage);
         }
       });
 
-      taskCommentForm?.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
+      taskCommentSubmit?.addEventListener('click', async (event) => {
         const activeTaskId = state.activeDiscussionTaskId || String(taskIdInput?.value ?? '').trim();
         const content = String(taskCommentInput?.value ?? '').trim();
 
