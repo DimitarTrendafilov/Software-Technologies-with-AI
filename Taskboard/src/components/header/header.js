@@ -34,9 +34,12 @@ async function updateAuthUI() {
   const user = await getCurrentUser();
   const guestItems = document.querySelectorAll('[data-auth-guest]');
   const userItems = document.querySelectorAll('[data-auth-user]');
+  const adminItems = document.querySelectorAll('[data-auth-admin]');
   const emailLabel = document.querySelector('[data-auth-email]');
+  const isAdmin = user?.app_metadata?.role === 'admin';
 
   guestItems.forEach((item) => setHidden(item, Boolean(user)));
   userItems.forEach((item) => setHidden(item, !user));
+  adminItems.forEach((item) => setHidden(item, !user || !isAdmin));
   setText(emailLabel, user?.email ?? '');
 }
