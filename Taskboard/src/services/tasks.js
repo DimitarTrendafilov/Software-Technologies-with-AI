@@ -147,8 +147,7 @@ export async function getAllUserTasks() {
   // Get all projects owned by the user
   const { data: projects, error: projectsError } = await supabase
     .from('projects')
-    .select('id')
-    .eq('owner_id', userData.user.id);
+    .select('id');
 
   if (projectsError || !projects || projects.length === 0) {
     return [];

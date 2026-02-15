@@ -6,6 +6,7 @@ const routes = [
   { path: '/login', load: () => import('./pages/login/login.js') },
   { path: '/dashboard', load: () => import('./pages/dashboard/dashboard.js') },
   { path: '/projects', load: () => import('./pages/projects/projects.js') },
+  { path: '/projects/:id/users', load: () => import('./pages/project-users/project-users.js') },
   { path: '/project/:id/add', load: () => import('./pages/project-form/project-form.js') },
   { path: '/project/:id/edit', load: () => import('./pages/project-form/project-form.js') },
   { path: '/project/:id/tasks', load: () => import('./pages/project-tasks/project-tasks.js') },

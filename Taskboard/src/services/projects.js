@@ -3,7 +3,7 @@ import { supabase } from './supabase.js';
 export async function getProjects() {
   const { data, error } = await supabase
     .from('projects')
-    .select('id, title, description, created_at, updated_at')
+    .select('id, title, description, owner_id, created_at, updated_at')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -16,7 +16,7 @@ export async function getProjects() {
 export async function getProject(projectId) {
   const { data, error } = await supabase
     .from('projects')
-    .select('id, title, description, created_at, updated_at')
+    .select('id, title, description, owner_id, created_at, updated_at')
     .eq('id', projectId)
     .single();
 
@@ -35,7 +35,7 @@ export async function createProject({ title, description, userId }) {
       description,
       owner_id: userId
     })
-    .select('id, title, description, created_at, updated_at')
+    .select('id, title, description, owner_id, created_at, updated_at')
     .single();
 
   if (error) {
@@ -50,7 +50,7 @@ export async function updateProject(projectId, { title, description }) {
     .from('projects')
     .update({ title, description })
     .eq('id', projectId)
-    .select('id, title, description, created_at, updated_at')
+    .select('id, title, description, owner_id, created_at, updated_at')
     .single();
 
   if (error) {

@@ -1,0 +1,8 @@
+.add-users-table-wrap {
+  max-height: 45vh;
+  overflow: auto;
+}
+
+.member-role {
+  white-space: nowrap;
+}

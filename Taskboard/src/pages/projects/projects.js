@@ -64,6 +64,7 @@ export async function render() {
 
         try {
           const projects = await getProjects();
+          const currentUserId = user.id;
 
           if (!projects.length) {
             rows.innerHTML = '';
@@ -76,6 +77,7 @@ export async function render() {
           rows.innerHTML = projects
             .map((project, index) => {
               const counts = metrics[index];
+              const isOwner = project.owner_id === currentUserId;
 
               return `
                 <tr>
@@ -87,8 +89,9 @@ export async function render() {
                   <td>${counts.stages}</td>
                   <td class="text-end projects-actions">
                     <a class="btn btn-sm btn-outline-secondary" href="/project/${project.id}/tasks" data-link>View Tasks</a>
-                    <a class="btn btn-sm btn-outline-primary" href="/project/${project.id}/edit" data-link>Edit</a>
-                    <button class="btn btn-sm btn-outline-danger" type="button" data-delete-project="${project.id}" data-project-title="${project.title}">Delete</button>
+                    ${isOwner ? `<a class="btn btn-sm btn-outline-dark" href="/projects/${project.id}/users" data-link>Users</a>` : ''}
+                    ${isOwner ? `<a class="btn btn-sm btn-outline-primary" href="/project/${project.id}/edit" data-link>Edit</a>` : ''}
+                    ${isOwner ? `<button class="btn btn-sm btn-outline-danger" type="button" data-delete-project="${project.id}" data-project-title="${project.title}">Delete</button>` : ''}
                   </td>
                 </tr>
               `;
