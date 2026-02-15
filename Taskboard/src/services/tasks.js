@@ -92,10 +92,28 @@ export async function createTask(stageId, { title, description, position, done }
   return data;
 }
 
-export async function updateTask(taskId, { title, description, position, done }) {
+export async function updateTask(taskId, { title, description, position, done, stageId }) {
+  const payload = {};
+
+  if (title !== undefined) {
+    payload.title = title;
+  }
+  if (description !== undefined) {
+    payload.description = description;
+  }
+  if (position !== undefined) {
+    payload.position = position;
+  }
+  if (done !== undefined) {
+    payload.done = done;
+  }
+  if (stageId !== undefined) {
+    payload.stage_id = stageId;
+  }
+
   const { data, error } = await supabase
     .from('tasks')
-    .update({ title, description, position, done })
+    .update(payload)
     .eq('id', taskId)
     .select('id, stage_id, title, description, position, done, created_at, updated_at')
     .single();

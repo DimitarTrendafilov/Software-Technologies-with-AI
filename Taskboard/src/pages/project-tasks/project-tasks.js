@@ -16,7 +16,8 @@ export async function render(params) {
       const state = {
         stages: [],
         tasksByStage: new Map(),
-        deleteTaskId: null
+        deleteTaskId: null,
+        drag: null
       };
 
       const title = document.querySelector('[data-project-title]');
@@ -75,7 +76,7 @@ export async function render(params) {
               ? tasks
                   .map(
                     (task) => `
-                        <article class="task-card">
+                        <article class="task-card" draggable="true" data-task-card="${task.id}" data-task-id="${task.id}" data-stage-id="${stage.id}">
                           <div class="task-card__header">
                             <h3 class="task-card__title">${escapeHtml(task.title)}</h3>
                             <div class="task-card__actions">
@@ -96,7 +97,7 @@ export async function render(params) {
                     <h2 class="h6 section-title mb-0">${escapeHtml(stage.name)}</h2>
                     <span class="badge bg-dark-subtle text-dark">${tasks.length}</span>
                   </div>
-                  <div class="tasks-stage__list">
+                  <div class="tasks-stage__list" data-stage-list="${stage.id}">
                     ${cards}
                     <button class="btn add-task-btn" type="button" data-add-task="${stage.id}">+ <span>Add New Task</span></button>
                   </div>
@@ -110,6 +111,69 @@ export async function render(params) {
         const tasksByStage = await Promise.all(state.stages.map((stage) => getTasks(stage.id)));
         state.tasksByStage = new Map(state.stages.map((stage, index) => [stage.id, tasksByStage[index] ?? []]));
         renderBoard();
+      };
+
+      const saveStageTasks = async (stageId) => {
+        const tasks = state.tasksByStage.get(stageId) ?? [];
+        for (let index = 0; index < tasks.length; index += 1) {
+          const task = tasks[index];
+          await updateTask(task.id, {
+            title: task.title,
+            description: task.description,
+            done: task.done,
+            position: index,
+            stageId
+          });
+          task.position = index;
+          task.stage_id = stageId;
+        }
+      };
+
+      const getDropIndex = (stageListElement, pointerY) => {
+        const cards = Array.from(stageListElement.querySelectorAll('[data-task-card]')).filter(
+          (card) => card.dataset.taskId !== state.drag?.taskId
+        );
+
+        for (let index = 0; index < cards.length; index += 1) {
+          const card = cards[index];
+          const rect = card.getBoundingClientRect();
+          const midpoint = rect.top + rect.height / 2;
+          if (pointerY < midpoint) {
+            return index;
+          }
+        }
+
+        return cards.length;
+      };
+
+      const moveTaskInState = (sourceStageId, destinationStageId, taskId, destinationIndex) => {
+        const sourceTasks = [...(state.tasksByStage.get(sourceStageId) ?? [])];
+        const taskIndex = sourceTasks.findIndex((task) => task.id === taskId);
+        if (taskIndex === -1) {
+          return false;
+        }
+
+        const [movedTask] = sourceTasks.splice(taskIndex, 1);
+        const destinationTasks = sourceStageId === destinationStageId
+          ? sourceTasks
+          : [...(state.tasksByStage.get(destinationStageId) ?? [])];
+
+        const boundedIndex = Math.max(0, Math.min(destinationIndex, destinationTasks.length));
+        destinationTasks.splice(boundedIndex, 0, movedTask);
+
+        state.tasksByStage.set(sourceStageId, sourceTasks);
+        state.tasksByStage.set(destinationStageId, destinationTasks);
+        return true;
+      };
+
+      const persistMove = async (sourceStageId, destinationStageId) => {
+        if (sourceStageId === destinationStageId) {
+          await saveStageTasks(sourceStageId);
+          return;
+        }
+
+        await saveStageTasks(sourceStageId);
+        await saveStageTasks(destinationStageId);
       };
 
       const openAddModal = (stageId) => {
@@ -224,6 +288,78 @@ export async function render(params) {
           const taskTitle = deleteButton.getAttribute('data-task-title') ?? 'this task';
           setText(deleteTaskTitle, taskTitle);
           deleteModal.show();
+        }
+      });
+
+      board?.addEventListener('dragstart', (event) => {
+        const taskCard = event.target.closest('[data-task-card]');
+        if (!taskCard) {
+          return;
+        }
+
+        const taskId = taskCard.getAttribute('data-task-id');
+        const sourceStageId = taskCard.getAttribute('data-stage-id');
+        if (!taskId || !sourceStageId) {
+          return;
+        }
+
+        state.drag = { taskId, sourceStageId };
+        taskCard.classList.add('is-dragging');
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', taskId);
+        }
+      });
+
+      board?.addEventListener('dragend', (event) => {
+        const taskCard = event.target.closest('[data-task-card]');
+        if (taskCard) {
+          taskCard.classList.remove('is-dragging');
+        }
+        board.querySelectorAll('[data-stage-list]').forEach((stageList) => {
+          stageList.classList.remove('is-drop-target');
+        });
+        state.drag = null;
+      });
+
+      board?.addEventListener('dragover', (event) => {
+        const stageList = event.target.closest('[data-stage-list]');
+        if (!stageList || !state.drag) {
+          return;
+        }
+
+        event.preventDefault();
+        board.querySelectorAll('[data-stage-list]').forEach((list) => {
+          list.classList.toggle('is-drop-target', list === stageList);
+        });
+      });
+
+      board?.addEventListener('drop', async (event) => {
+        const stageList = event.target.closest('[data-stage-list]');
+        if (!stageList || !state.drag) {
+          return;
+        }
+
+        event.preventDefault();
+        const destinationStageId = stageList.getAttribute('data-stage-list');
+        const { taskId, sourceStageId } = state.drag;
+        if (!destinationStageId || !taskId || !sourceStageId) {
+          return;
+        }
+
+        const destinationIndex = getDropIndex(stageList, event.clientY);
+        const moved = moveTaskInState(sourceStageId, destinationStageId, taskId, destinationIndex);
+        if (!moved) {
+          return;
+        }
+
+        renderBoard();
+
+        try {
+          await persistMove(sourceStageId, destinationStageId);
+        } catch (error) {
+          showInlineError(error?.message ?? 'Unable to move task.');
+          await reloadTasks();
         }
       });
 
