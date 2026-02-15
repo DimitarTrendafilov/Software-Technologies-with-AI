@@ -164,6 +164,60 @@
   gap: 0.55rem;
 }
 
+.task-checklist {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.task-checklist__items {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.task-checklist__add {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+}
+
+.task-checklist-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  border: 1px solid rgba(10, 31, 68, 0.1);
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.task-checklist-item__main {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.task-checklist-item__text {
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.task-checklist-item--done .task-checklist-item__text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-checklist-item__actions {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.task-checklist-item__actions .btn {
+  padding: 0.1rem 0.35rem;
+  line-height: 1.1;
+}
+
 .task-comment-item {
   border: 1px solid rgba(10, 31, 68, 0.1);
   border-radius: 0.65rem;

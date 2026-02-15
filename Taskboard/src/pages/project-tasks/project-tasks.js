@@ -6,6 +6,7 @@ import { createTask, deleteTask, getProjectStages, getTasks, getTasksPage, updat
 import { getTaskAttachmentsByTaskIds, uploadTaskAttachments } from '../../services/task-attachments.js';
 import { getTaskComments, createTaskComment, deleteTaskComment, getTaskCommentCounts } from '../../services/task-comments.js';
 import { getProjectLabels, getTaskLabelAssignments, setTaskLabels } from '../../services/task-labels.js';
+import { getTaskChecklist, createChecklistItem, updateChecklistItem, deleteChecklistItem } from '../../services/task-checklists.js';
 import { getProjectUsers } from '../../services/project-members.js';
 import { supabase } from '../../services/supabase.js';
 import { setHidden, setText } from '../../utils/dom.js';
@@ -52,7 +53,9 @@ export async function render(params) {
         commentCountsByTaskId: new Map(),
         projectLabels: [],
         labelsById: new Map(),
-        taskLabelIdsByTaskId: new Map()
+        taskLabelIdsByTaskId: new Map(),
+        checklistItemsByTaskId: new Map(),
+        activeChecklistTaskId: null
       };
 
       const title = document.querySelector('[data-project-title]');
@@ -78,6 +81,10 @@ export async function render(params) {
       const taskCommentsList = document.querySelector('[data-task-comments-list]');
       const taskCommentInput = document.querySelector('[data-task-comment-input]');
       const taskCommentSubmit = document.querySelector('[data-task-comment-submit]');
+      const taskChecklistItems = document.querySelector('[data-task-checklist-items]');
+      const taskChecklistInput = document.querySelector('[data-task-checklist-input]');
+      const taskChecklistAdd = document.querySelector('[data-task-checklist-add]');
+      const taskChecklistEmpty = document.querySelector('[data-task-checklist-empty]');
       const taskLabelsList = document.querySelector('[data-task-labels-list]');
       const taskLabelsEmpty = document.querySelector('[data-task-labels-empty]');
       const filterMyTasksCheckbox = document.querySelector('[data-filter-my-tasks]');
@@ -241,6 +248,117 @@ export async function render(params) {
             taskCommentsList.innerHTML = '<p class="text-danger small mb-0">Failed to load comments.</p>';
           }
         }
+      };
+
+      const setChecklistControlsEnabled = (enabled) => {
+        if (taskChecklistInput) {
+          taskChecklistInput.disabled = !enabled;
+        }
+        if (taskChecklistAdd) {
+          taskChecklistAdd.disabled = !enabled;
+        }
+      };
+
+      const renderTaskChecklist = (items) => {
+        if (!taskChecklistItems) {
+          return;
+        }
+
+        if (!items?.length) {
+          taskChecklistItems.innerHTML = '';
+          setHidden(taskChecklistEmpty, false);
+          return;
+        }
+
+        const sorted = [...items].sort((first, second) => {
+          const firstPosition = first.position ?? 0;
+          const secondPosition = second.position ?? 0;
+          if (firstPosition !== secondPosition) {
+            return firstPosition - secondPosition;
+          }
+          return new Date(first.created_at).getTime() - new Date(second.created_at).getTime();
+        });
+
+        taskChecklistItems.innerHTML = sorted
+          .map((item, index) => {
+            const isDoneClass = item.is_done ? ' task-checklist-item--done' : '';
+            const disableUp = index === 0 ? ' disabled' : '';
+            const disableDown = index === sorted.length - 1 ? ' disabled' : '';
+
+            return `
+              <div class="task-checklist-item${isDoneClass}" data-checklist-item="${escapeHtml(item.id)}">
+                <label class="task-checklist-item__main">
+                  <input type="checkbox" data-checklist-toggle data-checklist-id="${escapeHtml(item.id)}"${item.is_done ? ' checked' : ''} />
+                  <span class="task-checklist-item__text">${escapeHtml(item.content)}</span>
+                </label>
+                <div class="task-checklist-item__actions">
+                  <button type="button" class="btn btn-sm btn-outline-secondary" data-checklist-up="${escapeHtml(
+                    item.id
+                  )}"${disableUp}>↑</button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" data-checklist-down="${escapeHtml(
+                    item.id
+                  )}"${disableDown}>↓</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" data-checklist-delete="${escapeHtml(
+                    item.id
+                  )}">Delete</button>
+                </div>
+              </div>
+            `;
+          })
+          .join('');
+
+        setHidden(taskChecklistEmpty, true);
+      };
+
+      const loadTaskChecklist = async (taskId) => {
+        if (!taskId) {
+          return;
+        }
+
+        state.activeChecklistTaskId = taskId;
+        setChecklistControlsEnabled(true);
+        if (taskChecklistItems) {
+          taskChecklistItems.innerHTML = '<p class="text-muted small mb-0">Loading checklist...</p>';
+        }
+
+        try {
+          const items = await getTaskChecklist(taskId);
+          state.checklistItemsByTaskId.set(taskId, items);
+          renderTaskChecklist(items);
+        } catch (error) {
+          if (taskChecklistItems) {
+            taskChecklistItems.innerHTML = '<p class="text-danger small mb-0">Failed to load checklist.</p>';
+          }
+        }
+      };
+
+      const getChecklistItemsForTask = (taskId) => state.checklistItemsByTaskId.get(taskId) ?? [];
+
+      const swapChecklistItems = async (taskId, sourceId, targetId) => {
+        const items = [...getChecklistItemsForTask(taskId)];
+        const sourceIndex = items.findIndex((item) => item.id === sourceId);
+        const targetIndex = items.findIndex((item) => item.id === targetId);
+        if (sourceIndex === -1 || targetIndex === -1) {
+          return;
+        }
+
+        const sourceItem = items[sourceIndex];
+        const targetItem = items[targetIndex];
+        const sourcePosition = sourceItem.position ?? sourceIndex;
+        const targetPosition = targetItem.position ?? targetIndex;
+
+        await Promise.all([
+          updateChecklistItem(sourceItem.id, { position: targetPosition }),
+          updateChecklistItem(targetItem.id, { position: sourcePosition })
+        ]);
+
+        sourceItem.position = targetPosition;
+        targetItem.position = sourcePosition;
+
+        items[sourceIndex] = targetItem;
+        items[targetIndex] = sourceItem;
+        state.checklistItemsByTaskId.set(taskId, items);
+        renderTaskChecklist(items);
       };
 
       const getStageMeta = (stageId) => state.stageTaskState.get(stageId);
@@ -652,6 +770,7 @@ export async function render(params) {
         setText(taskModalTitle, 'Add Task');
         showTaskFormError('');
         state.activeDiscussionTaskId = null;
+        state.activeChecklistTaskId = null;
         if (taskForm) {
           taskForm.dataset.mode = 'add';
         }
@@ -678,6 +797,14 @@ export async function render(params) {
         if (taskFilesInput) {
           taskFilesInput.value = '';
         }
+        if (taskChecklistInput) {
+          taskChecklistInput.value = '';
+        }
+        if (taskChecklistEmpty) {
+          setText(taskChecklistEmpty, 'Save the task first to start a checklist.');
+        }
+        setChecklistControlsEnabled(false);
+        renderTaskChecklist([]);
         if (taskCommentInput) {
           taskCommentInput.value = '';
         }
@@ -723,12 +850,19 @@ export async function render(params) {
         if (taskFilesInput) {
           taskFilesInput.value = '';
         }
+        if (taskChecklistInput) {
+          taskChecklistInput.value = '';
+        }
+        if (taskChecklistEmpty) {
+          setText(taskChecklistEmpty, 'No checklist items yet.');
+        }
         if (taskCommentInput) {
           taskCommentInput.value = '';
         }
         setHidden(taskDiscussion, false);
         taskModal.show();
         await loadTaskDiscussion(task.id);
+        await loadTaskChecklist(task.id);
       };
 
       setHidden(authRequired, true);
@@ -1093,6 +1227,125 @@ export async function render(params) {
           renderBoard();
         } catch (error) {
           showTaskFormError(error?.message ?? 'Unable to delete comment.');
+        }
+      });
+
+      taskChecklistAdd?.addEventListener('click', async () => {
+        const activeTaskId = state.activeChecklistTaskId || String(taskIdInput?.value ?? '').trim();
+        const content = String(taskChecklistInput?.value ?? '').trim();
+
+        if (!activeTaskId) {
+          showTaskFormError('Save the task before adding checklist items.');
+          return;
+        }
+
+        if (!content) {
+          showTaskFormError('Checklist item cannot be empty.');
+          return;
+        }
+
+        try {
+          const items = getChecklistItemsForTask(activeTaskId);
+          const nextPosition = items.length
+            ? Math.max(...items.map((item) => item.position ?? 0)) + 1
+            : 0;
+          const created = await createChecklistItem(activeTaskId, { content, position: nextPosition });
+          const updated = [...items, created];
+          state.checklistItemsByTaskId.set(activeTaskId, updated);
+          renderTaskChecklist(updated);
+          if (taskChecklistInput) {
+            taskChecklistInput.value = '';
+          }
+          showTaskFormError('');
+        } catch (error) {
+          showTaskFormError(error?.message ?? 'Unable to add checklist item.');
+        }
+      });
+
+      taskChecklistItems?.addEventListener('change', async (event) => {
+        const checkbox = event.target.closest('[data-checklist-toggle]');
+        if (!checkbox) {
+          return;
+        }
+
+        const itemId = checkbox.getAttribute('data-checklist-id');
+        const activeTaskId = state.activeChecklistTaskId || String(taskIdInput?.value ?? '').trim();
+        if (!itemId || !activeTaskId) {
+          return;
+        }
+
+        try {
+          const items = [...getChecklistItemsForTask(activeTaskId)];
+          const target = items.find((item) => item.id === itemId);
+          if (!target) {
+            return;
+          }
+
+          const isDone = checkbox.checked;
+          await updateChecklistItem(itemId, { isDone });
+          target.is_done = isDone;
+          state.checklistItemsByTaskId.set(activeTaskId, items);
+          renderTaskChecklist(items);
+        } catch (error) {
+          showTaskFormError(error?.message ?? 'Unable to update checklist item.');
+        }
+      });
+
+      taskChecklistItems?.addEventListener('click', async (event) => {
+        const deleteButton = event.target.closest('[data-checklist-delete]');
+        if (deleteButton) {
+          const itemId = deleteButton.getAttribute('data-checklist-delete');
+          const activeTaskId = state.activeChecklistTaskId || String(taskIdInput?.value ?? '').trim();
+          if (!itemId || !activeTaskId) {
+            return;
+          }
+
+          try {
+            await deleteChecklistItem(itemId);
+            const items = getChecklistItemsForTask(activeTaskId).filter((item) => item.id !== itemId);
+            state.checklistItemsByTaskId.set(activeTaskId, items);
+            renderTaskChecklist(items);
+          } catch (error) {
+            showTaskFormError(error?.message ?? 'Unable to delete checklist item.');
+          }
+          return;
+        }
+
+        const moveUp = event.target.closest('[data-checklist-up]');
+        if (moveUp) {
+          const itemId = moveUp.getAttribute('data-checklist-up');
+          const activeTaskId = state.activeChecklistTaskId || String(taskIdInput?.value ?? '').trim();
+          if (!itemId || !activeTaskId) {
+            return;
+          }
+
+          const items = [...getChecklistItemsForTask(activeTaskId)];
+          const sorted = items
+            .map((item) => item)
+            .sort((first, second) => (first.position ?? 0) - (second.position ?? 0));
+          const index = sorted.findIndex((item) => item.id === itemId);
+          if (index > 0) {
+            await swapChecklistItems(activeTaskId, itemId, sorted[index - 1].id);
+          }
+          return;
+        }
+
+        const moveDown = event.target.closest('[data-checklist-down]');
+        if (moveDown) {
+          const itemId = moveDown.getAttribute('data-checklist-down');
+          const activeTaskId = state.activeChecklistTaskId || String(taskIdInput?.value ?? '').trim();
+          if (!itemId || !activeTaskId) {
+            return;
+          }
+
+          const items = [...getChecklistItemsForTask(activeTaskId)];
+          const sorted = items
+            .map((item) => item)
+            .sort((first, second) => (first.position ?? 0) - (second.position ?? 0));
+          const index = sorted.findIndex((item) => item.id === itemId);
+          if (index !== -1 && index < sorted.length - 1) {
+            await swapChecklistItems(activeTaskId, itemId, sorted[index + 1].id);
+          }
         }
       });
 
