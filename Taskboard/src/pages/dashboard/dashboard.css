@@ -25,3 +25,44 @@
   margin-top: 2.5rem;
   text-align: center;
 }
+
+/* Statistics Cards */
+.stat-card {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 150, 136, 0.1);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 150, 136, 0.12);
+  border-color: rgba(0, 150, 136, 0.2);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.stat-label {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.95rem;
+}

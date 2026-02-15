@@ -2,6 +2,7 @@ import './dashboard.css';
 import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser } from '../../services/auth.js';
 import { createProject, getProjects } from '../../services/projects.js';
+import { getAllUserTasks } from '../../services/tasks.js';
 import { setHidden, setText } from '../../utils/dom.js';
 import { showSuccess, showError as showErrorToast } from '../../services/toast.js';
 
@@ -19,6 +20,10 @@ export async function render() {
       const feedback = document.querySelector('[data-board-feedback]');
       const createButton = document.querySelector('[data-create-board]');
       const cancelButton = document.querySelector('[data-board-cancel]');
+      const statsSection = document.querySelector('[data-stats-section]');
+      const statProjects = document.querySelector('[data-stat-projects]');
+      const statOpenTasks = document.querySelector('[data-stat-open-tasks]');
+      const statDoneTasks = document.querySelector('[data-stat-done-tasks]');
 
       const showError = (message) => {
         setText(errorBox, message);
@@ -26,6 +31,15 @@ export async function render() {
         if (message) {
           showErrorToast(message);
         }
+      };
+
+      const updateStatistics = (projects, tasks) => {
+        const openTasks = tasks.filter(task => !task.done).length;
+        const doneTasks = tasks.filter(task => task.done).length;
+        
+        setText(statProjects, projects.length.toString());
+        setText(statOpenTasks, openTasks.toString());
+        setText(statDoneTasks, doneTasks.toString());
       };
 
       const renderProjects = (projects) => {
@@ -67,14 +81,21 @@ export async function render() {
         const user = await getCurrentUser();
         if (!user) {
           setHidden(authRequired, false);
+          setHidden(statsSection, true);
           renderProjects([]);
           return;
         }
 
         try {
-          const projects = await getProjects();
+          const [projects, tasks] = await Promise.all([
+            getProjects(),
+            getAllUserTasks()
+          ]);
+          
           renderProjects(projects);
+          updateStatistics(projects, tasks);
           setHidden(emptyState, projects.length > 0);
+          setHidden(statsSection, false);
         } catch (error) {
           showError(error?.message ?? 'Unable to load projects.');
         }

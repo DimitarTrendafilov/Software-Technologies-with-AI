@@ -117,3 +117,38 @@ export async function deleteTask(taskId) {
     throw error;
   }
 }
+
+export async function getAllUserTasks() {
+  // First get the current user
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  
+  if (userError || !userData.user) {
+    return [];
+  }
+
+  // Get all tasks for projects owned by the user
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(`
+      id,
+      title,
+      description,
+      done,
+      created_at,
+      updated_at,
+      stage_id,
+      project_stages!inner (
+        project_id,
+        projects!inner (
+          owner_id
+        )
+      )
+    `)
+    .eq('project_stages.projects.owner_id', userData.user.id);
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
