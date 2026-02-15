@@ -1,0 +1,42 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(246, 240, 232, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.navbar-brand {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+}
+
+.brand-mark {
+  background: linear-gradient(120deg, var(--ink), var(--accent));
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.nav-link {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.nav-link.active {
+  color: var(--accent);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.35rem 1.1rem;
+  box-shadow: 0 10px 20px rgba(225, 95, 61, 0.3);
+}
+
+.btn-accent:hover {
+  background: var(--accent-deep);
+  color: #fff;
+}

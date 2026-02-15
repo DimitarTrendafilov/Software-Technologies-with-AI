@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --ink: #0f172a;
+  --paper: #f6f0e8;
+  --accent: #e15f3d;
+  --accent-deep: #9e3a26;
+  --teal: #2b6d77;
+  --mist: #e6eef0;
+  --shadow: rgba(15, 23, 42, 0.16);
+  --radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top left, #ffffff 0%, var(--paper) 38%, #f1ebe3 100%);
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+.page-content {
+  min-height: calc(100vh - 220px);
+  padding: 2.5rem 0 3rem;
+}
+
+.section-title {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 40px var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.badge-tag {
+  background: var(--mist);
+  color: var(--teal);
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+}

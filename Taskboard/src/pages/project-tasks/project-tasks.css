@@ -1,0 +1,31 @@
+.task-column,
+.task-side {
+  padding: 1.5rem;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.task-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.milestone {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  margin-top: 1rem;
+}

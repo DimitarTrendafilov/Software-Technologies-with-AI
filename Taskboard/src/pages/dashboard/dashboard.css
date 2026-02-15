@@ -1,0 +1,13 @@
+.board-card {
+  padding: 1.5rem;
+  position: relative;
+  min-height: 220px;
+}
+
+.board-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}

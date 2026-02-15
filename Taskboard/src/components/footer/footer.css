@@ -1,0 +1,25 @@
+.site-footer {
+  padding: 2rem 0 2.5rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  background: #f4ede4;
+}
+
+.site-footer strong {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  font-size: 1.2rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.25rem;
+  font-weight: 600;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+}

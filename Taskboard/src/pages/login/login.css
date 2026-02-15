@@ -1,0 +1,7 @@
+.login-card {
+  padding: 2rem;
+}
+
+.login-card .form-control {
+  border-radius: 12px;
+}
