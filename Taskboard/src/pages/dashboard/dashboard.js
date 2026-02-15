@@ -1,7 +1,7 @@
 import './dashboard.css';
 import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser } from '../../services/auth.js';
-import { createBoard, getBoards } from '../../services/boards.js';
+import { createProject, getProjects } from '../../services/projects.js';
 import { setHidden, setText } from '../../utils/dom.js';
 
 export async function render() {
@@ -24,23 +24,23 @@ export async function render() {
         setHidden(errorBox, !message);
       };
 
-      const renderBoards = (boards) => {
+      const renderProjects = (projects) => {
         if (!list) {
           return;
         }
 
-        list.innerHTML = boards
+        list.innerHTML = projects
           .map(
-            (board) => `
+            (project) => `
             <div class="col-md-6 col-xl-4">
               <article class="glass-card board-card">
                 <div class="board-card__meta">
-                  <span class="badge-tag">Board</span>
-                  <span class="text-muted">${new Date(board.created_at).toLocaleDateString()}</span>
+                  <span class="badge-tag">Project</span>
+                  <span class="text-muted">${new Date(project.created_at).toLocaleDateString()}</span>
                 </div>
-                <h3 class="h5 section-title">${board.name}</h3>
-                <p>${board.description || 'No description yet.'}</p>
-                <a class="stretched-link" href="/projects/${board.id}/tasks" data-link>View tasks</a>
+                <h3 class="h5 section-title">${project.title}</h3>
+                <p>${project.description || 'No description yet.'}</p>
+                <a class="stretched-link" href="/projects/${project.id}/tasks" data-link>View tasks</a>
               </article>
             </div>
           `
@@ -55,7 +55,7 @@ export async function render() {
         }
       };
 
-      const loadBoards = async () => {
+      const loadProjects = async () => {
         showError('');
         setHidden(authRequired, true);
         setHidden(emptyState, true);
@@ -63,16 +63,16 @@ export async function render() {
         const user = await getCurrentUser();
         if (!user) {
           setHidden(authRequired, false);
-          renderBoards([]);
+          renderProjects([]);
           return;
         }
 
         try {
-          const boards = await getBoards();
-          renderBoards(boards);
-          setHidden(emptyState, boards.length > 0);
+          const projects = await getProjects();
+          renderProjects(projects);
+          setHidden(emptyState, projects.length > 0);
         } catch (error) {
-          showError(error?.message ?? 'Unable to load boards.');
+          showError(error?.message ?? 'Unable to load projects.');
         }
       };
 
@@ -102,19 +102,19 @@ export async function render() {
         }
 
         try {
-          await createBoard({ name, description, ownerId: user.id });
+          await createProject({ title: name, description, userId: user.id });
           form.reset();
           toggleForm(false);
           setText(feedback, '');
-          await loadBoards();
+          await loadProjects();
         } catch (error) {
-          showError(error?.message ?? 'Unable to create board.');
+          showError(error?.message ?? 'Unable to create project.');
           setText(feedback, '');
         }
       });
 
-      window.addEventListener('auth:changed', loadBoards);
-      loadBoards();
+      window.addEventListener('auth:changed', loadProjects);
+      loadProjects();
     }
   };
 }
