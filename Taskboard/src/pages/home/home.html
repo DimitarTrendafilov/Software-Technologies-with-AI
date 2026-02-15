@@ -1,62 +1,123 @@
 <section class="hero-section">
   <div class="container">
-    <div class="row g-4 align-items-center">
+    <div class="row g-5 align-items-center">
       <div class="col-lg-6">
-        <p class="badge-tag">Multi-page Vite demo</p>
-        <h1 class="display-5 section-title">Plan work with clarity and calm.</h1>
-        <p class="lead mt-3">
-          Taskboard keeps teams aligned with boards, lists, and tasks that move at the speed of your day.
+        <p class="badge-tag">Task Management Made Simple</p>
+        <h1 class="display-4 section-title">Organize. Align. Deliver.</h1>
+        <p class="lead mt-4 text-muted">
+          Taskboard is a clean, intuitive workspace for managing projects, stages, and tasks. Keep your team aligned with zero friction.
         </p>
-        <div class="d-flex flex-wrap gap-3 mt-4">
-          <a class="btn btn-accent" href="/dashboard" data-link>Go to Dashboard</a>
-          <a class="btn btn-outline-dark" href="/projects/orion/tasks" data-link>Explore Project Tasks</a>
+        <div class="d-flex flex-wrap gap-3 mt-5">
+          <a class="btn btn-accent btn-lg" href="/login" data-link>
+            <span>Get Started</span>
+          </a>
+          <a class="btn btn-outline-dark btn-lg" href="/login" data-link>
+            Sign In
+          </a>
         </div>
+        <p class="text-muted mt-4 small">No credit card required. Free forever for individuals.</p>
       </div>
       <div class="col-lg-6">
-        <div class="hero-card glass-card">
-          <div class="hero-card__header">
-            <span>Launch Prep</span>
-            <span class="text-muted">This week</span>
+        <div class="hero-visual">
+          <div class="glass-card hero-preview">
+            <div class="preview-header">
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
+              <div class="preview-dot"></div>
+            </div>
+            <div class="preview-content">
+              <div class="preview-task-card">
+                <span class="preview-tag">Projects</span>
+                <h4>Website Redesign</h4>
+                <p>Build and launch in 4 weeks</p>
+              </div>
+              <div class="preview-stages">
+                <div class="preview-stage">
+                  <span class="stage-label">Not Started</span>
+                  <span class="stage-count">2</span>
+                </div>
+                <div class="preview-stage active">
+                  <span class="stage-label">In Progress</span>
+                  <span class="stage-count">5</span>
+                </div>
+                <div class="preview-stage done">
+                  <span class="stage-label">Done</span>
+                  <span class="stage-count">3</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <ul class="hero-card__list">
-            <li>
-              <span>Finalize scope</span>
-              <span class="badge bg-success-subtle text-success">Done</span>
-            </li>
-            <li>
-              <span>Review dependencies</span>
-              <span class="badge bg-warning-subtle text-warning">Pending</span>
-            </li>
-            <li>
-              <span>Align stakeholders</span>
-              <span class="badge bg-primary-subtle text-primary">In progress</span>
-            </li>
-          </ul>
-          <div class="hero-card__footer">Next sync in 3 hours</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="container mt-5">
-  <div class="row g-4">
-    <div class="col-md-4">
-      <div class="glass-card info-card">
-        <h3 class="h5 section-title">Boards that breathe</h3>
-        <p>Move lists with a sense of flow and keep every card structured.</p>
+<section class="features-section">
+  <div class="container">
+    <h2 class="section-title text-center mb-5 display-6">Features Built for Focus</h2>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="h5 section-title">Organize Your Work</h3>
+          <p class="text-muted">Create projects, define stages, and track tasks in a clean, logical hierarchy.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3 class="h5 section-title">Clear Status Tracking</h3>
+          <p class="text-muted">See at a glance where every task stands with intuitive stage management.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3 class="h5 section-title">Ship Faster</h3>
+          <p class="text-muted">Reduce friction in planning and execution. Focus on what matters most.</p>
+        </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="glass-card info-card">
-        <h3 class="h5 section-title">Signals over noise</h3>
-        <p>Color-coded status badges keep priorities visible without clutter.</p>
+  </div>
+</section>
+
+<section class="how-it-works-section">
+  <div class="container">
+    <h2 class="section-title text-center mb-5 display-6">How It Works</h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h4 class="section-title mt-3">Create a Project</h4>
+          <p class="text-muted">Start a new project with a title and description.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h4 class="section-title mt-3">Define Stages</h4>
+          <p class="text-muted">Set up workflow stages like Not Started, In Progress, Done.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h4 class="section-title mt-3">Track Tasks</h4>
+          <p class="text-muted">Add tasks to stages and move them as work progresses.</p>
+        </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="glass-card info-card">
-        <h3 class="h5 section-title">Shared momentum</h3>
-        <p>Hand-offs, owners, and due dates land right where you expect them.</p>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="glass-card cta-card">
+      <div class="cta-content">
+        <h2 class="section-title mb-3">Ready to streamline your workflow?</h2>
+        <p class="text-muted mb-4">Join teams worldwide who are getting more done with Taskboard.</p>
+        <a class="btn btn-accent btn-lg" href="/login" data-link>Start Your Free Account</a>
       </div>
     </div>
   </div>
