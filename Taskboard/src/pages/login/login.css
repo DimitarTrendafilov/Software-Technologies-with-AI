@@ -5,3 +5,12 @@
 .login-card .form-control {
   border-radius: 12px;
 }
+
+.login-card .btn-group .btn {
+  border-radius: 999px;
+}
+
+.login-card .btn-group .btn.active {
+  background: var(--ink);
+  color: #fff;
+}

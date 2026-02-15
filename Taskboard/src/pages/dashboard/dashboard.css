@@ -11,3 +11,17 @@
   margin-bottom: 1rem;
   font-weight: 600;
 }
+
+.board-form {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.board-form .form-control {
+  border-radius: 12px;
+}
+
+.empty-state {
+  margin-top: 2.5rem;
+  text-align: center;
+}

@@ -2,8 +2,18 @@
   <div class="row justify-content-center">
     <div class="col-lg-6">
       <div class="glass-card login-card">
-        <h1 class="section-title h3">Welcome back</h1>
-        <p class="text-muted">Sign in to continue to your boards.</p>
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <h1 class="section-title h3" data-auth-title>Welcome back</h1>
+            <p class="text-muted" data-auth-subtitle>Sign in to continue to your boards.</p>
+          </div>
+          <div class="btn-group" role="group" aria-label="Auth mode">
+            <button class="btn btn-outline-dark active" type="button" data-auth-mode="signin">Sign in</button>
+            <button class="btn btn-outline-dark" type="button" data-auth-mode="signup">Create account</button>
+          </div>
+        </div>
+        <div class="alert alert-success mt-3 d-none" role="alert" data-auth-success></div>
+        <div class="alert alert-danger mt-3 d-none" role="alert" data-auth-error></div>
         <form class="mt-4" id="login-form">
           <div class="mb-3">
             <label class="form-label" for="email">Email</label>
@@ -13,8 +23,8 @@
             <label class="form-label" for="password">Password</label>
             <input class="form-control" type="password" id="password" placeholder="••••••••" required />
           </div>
-          <button class="btn btn-accent w-100" type="submit">Sign in</button>
-          <div class="form-text mt-3">New here? Create a board in minutes.</div>
+          <button class="btn btn-accent w-100" type="submit" data-auth-submit>Sign in</button>
+          <div class="form-text mt-3" data-auth-helper>New here? Create a board in minutes.</div>
         </form>
       </div>
     </div>

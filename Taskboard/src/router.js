@@ -1,4 +1,4 @@
-import { renderHeader } from './components/header/header.js';
+import { renderHeader, mountHeader } from './components/header/header.js';
 import { renderFooter } from './components/footer/footer.js';
 
 const routes = [
@@ -51,6 +51,7 @@ async function handleRoute() {
   const footer = await renderFooter();
 
   app.innerHTML = `${header}<main class="page-content">${html}</main>${footer}`;
+  await mountHeader();
   setActiveNav(path);
 
   if (typeof onMount === 'function') {

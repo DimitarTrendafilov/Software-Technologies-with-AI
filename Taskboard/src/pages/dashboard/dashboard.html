@@ -4,41 +4,32 @@
       <h1 class="section-title display-6">Your boards</h1>
       <p class="text-muted">Pick up where you left off or open a new project.</p>
     </div>
-    <button class="btn btn-accent">Create board</button>
+    <button class="btn btn-accent" type="button" data-create-board>Create board</button>
   </div>
-  <div class="row g-4">
-    <div class="col-md-6 col-xl-4">
-      <article class="glass-card board-card">
-        <div class="board-card__meta">
-          <span class="badge-tag">Strategy</span>
-          <span class="text-muted">8 tasks</span>
-        </div>
-        <h3 class="h5 section-title">Orion launch</h3>
-        <p>Cross-functional planning and stakeholder syncs.</p>
-        <a class="stretched-link" href="/projects/orion/tasks" data-link>View tasks</a>
-      </article>
-    </div>
-    <div class="col-md-6 col-xl-4">
-      <article class="glass-card board-card">
-        <div class="board-card__meta">
-          <span class="badge-tag">Product</span>
-          <span class="text-muted">14 tasks</span>
-        </div>
-        <h3 class="h5 section-title">Atlas rebuild</h3>
-        <p>Modernize the backlog and align delivery milestones.</p>
-        <a class="stretched-link" href="/projects/atlas/tasks" data-link>View tasks</a>
-      </article>
-    </div>
-    <div class="col-md-6 col-xl-4">
-      <article class="glass-card board-card">
-        <div class="board-card__meta">
-          <span class="badge-tag">Design</span>
-          <span class="text-muted">5 tasks</span>
-        </div>
-        <h3 class="h5 section-title">Nimbus rollout</h3>
-        <p>Refresh user flows and highlight release updates.</p>
-        <a class="stretched-link" href="/projects/nimbus/tasks" data-link>View tasks</a>
-      </article>
-    </div>
+  <div class="glass-card board-form d-none" data-board-form>
+    <form class="row g-3" data-board-create-form>
+      <div class="col-md-6">
+        <label class="form-label" for="board-name">Board name</label>
+        <input class="form-control" id="board-name" name="name" placeholder="e.g. Launch plan" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="board-description">Description</label>
+        <input class="form-control" id="board-description" name="description" placeholder="Optional" />
+      </div>
+      <div class="col-12 d-flex flex-wrap gap-2">
+        <button class="btn btn-accent" type="submit">Save board</button>
+        <button class="btn btn-outline-secondary" type="button" data-board-cancel>Cancel</button>
+        <span class="text-muted align-self-center" data-board-feedback></span>
+      </div>
+    </form>
+  </div>
+  <div class="alert alert-info d-none" role="alert" data-auth-required>
+    Sign in to view and manage boards.
+  </div>
+  <div class="alert alert-danger d-none" role="alert" data-board-error></div>
+  <div class="row g-4" data-board-list></div>
+  <div class="empty-state d-none" data-empty-state>
+    <h3 class="section-title h5">No boards yet</h3>
+    <p class="text-muted">Create your first board to start organizing lists and tasks.</p>
   </div>
 </section>
