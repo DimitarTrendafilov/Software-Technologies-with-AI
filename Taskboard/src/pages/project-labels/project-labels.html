@@ -1,0 +1,90 @@
+<section class="container">
+  <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="section-title display-6">Project labels</h1>
+      <p class="text-muted">Browse tasks by label and manage tag colors.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-accent" type="button" data-add-label-btn>Add label</button>
+      <a class="btn btn-outline-dark" href="/projects" data-link>Back to Projects</a>
+      <a class="btn btn-outline-secondary" href="/projects" data-link data-back-tasks>Back to Tasks</a>
+    </div>
+  </div>
+
+  <div class="alert alert-info d-none" role="alert" data-auth-required>
+    Sign in to manage labels.
+  </div>
+  <div class="alert alert-danger d-none" role="alert" data-labels-error></div>
+
+  <div class="labels-layout" data-labels-layout>
+    <aside class="labels-panel">
+      <h2 class="h6 section-title mb-3">Labels</h2>
+      <div class="labels-list" data-labels-list></div>
+      <div class="empty-state d-none" data-empty-labels>
+        <h3 class="section-title h6">No labels yet</h3>
+        <p class="text-muted">Create your first label to organize tasks.</p>
+      </div>
+    </aside>
+
+    <section class="labels-tasks-panel">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h2 class="h6 section-title mb-1" data-selected-label-name>Tasks</h2>
+          <p class="text-muted small mb-0" data-selected-label-meta>Select a label to see its tasks.</p>
+        </div>
+        <span class="badge bg-dark-subtle text-dark" data-selected-label-count>0</span>
+      </div>
+      <div class="labels-tasks-list" data-labels-tasks-list></div>
+      <div class="empty-state d-none" data-empty-tasks>
+        <h3 class="section-title h6">No tasks for this label</h3>
+        <p class="text-muted">Assign this label to a task to see it here.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal fade" id="addLabelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5">Add label</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form data-add-label-form>
+          <div class="modal-body">
+            <div class="alert alert-danger d-none" role="alert" data-add-label-error></div>
+            <div class="mb-3">
+              <label class="form-label" for="label-name">Label name</label>
+              <input class="form-control" id="label-name" data-label-name maxlength="40" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="label-color">Color</label>
+              <input class="form-control form-control-color" id="label-color" type="color" value="#6c757d" data-label-color />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-accent">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="deleteLabelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5">Delete label</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">Delete <strong data-delete-label-name></strong>? This will remove it from all tasks.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" data-confirm-delete-label>Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

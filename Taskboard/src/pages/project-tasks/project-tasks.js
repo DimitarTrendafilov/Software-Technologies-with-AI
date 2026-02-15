@@ -4,7 +4,8 @@ import { getCurrentUser } from '../../services/auth.js';
 import { getProject } from '../../services/projects.js';
 import { createTask, deleteTask, getProjectStages, getTasks, getTasksPage, updateTask } from '../../services/tasks.js';
 import { getTaskAttachmentsByTaskIds, uploadTaskAttachments } from '../../services/task-attachments.js';
-import { getTaskComments, createTaskComment, deleteTaskComment } from '../../services/task-comments.js';
+import { getTaskComments, createTaskComment, deleteTaskComment, getTaskCommentCounts } from '../../services/task-comments.js';
+import { getProjectLabels, getTaskLabelAssignments, setTaskLabels } from '../../services/task-labels.js';
 import { getProjectUsers } from '../../services/project-members.js';
 import { supabase } from '../../services/supabase.js';
 import { setHidden, setText } from '../../utils/dom.js';
@@ -47,7 +48,11 @@ export async function render(params) {
         userEmailById: new Map(),
         activeDiscussionTaskId: null,
         projectUsers: [],
-        filterMyTasks: false
+        filterMyTasks: false,
+        commentCountsByTaskId: new Map(),
+        projectLabels: [],
+        labelsById: new Map(),
+        taskLabelIdsByTaskId: new Map()
       };
 
       const title = document.querySelector('[data-project-title]');
@@ -72,7 +77,11 @@ export async function render(params) {
       const taskCommentsList = document.querySelector('[data-task-comments-list]');
       const taskCommentInput = document.querySelector('[data-task-comment-input]');
       const taskCommentSubmit = document.querySelector('[data-task-comment-submit]');
+      const taskLabelsList = document.querySelector('[data-task-labels-list]');
+      const taskLabelsEmpty = document.querySelector('[data-task-labels-empty]');
       const filterMyTasksCheckbox = document.querySelector('[data-filter-my-tasks]');
+      const manageLabelsLinks = document.querySelectorAll('[data-manage-labels-link]');
+      const viewLabelsLink = document.querySelector('[data-view-labels-link]');
       const manageTeamLink = document.querySelector('[data-manage-team-link]');
 
       const taskModal = new Modal(document.getElementById('taskFormModal'));
@@ -125,11 +134,9 @@ export async function render(params) {
 
       const renderAssigneeOptions = (selectedUserId = '') => {
         if (!taskAssigneeInput) {
-          console.warn('taskAssigneeInput not found');
           return;
         }
 
-        console.log('Rendering assignee options with', state.projectUsers.length, 'users');
         const selected = String(selectedUserId ?? '');
         taskAssigneeInput.innerHTML = [
           '<option value="">Unassigned</option>',
@@ -182,8 +189,14 @@ export async function render(params) {
           taskCommentsList.innerHTML = '<p class="text-muted small mb-0">Loading comments...</p>';
         }
 
-        const comments = await getTaskComments(taskId);
-        renderTaskComments(comments);
+        try {
+          const comments = await getTaskComments(taskId);
+          renderTaskComments(comments);
+        } catch (error) {
+          if (taskCommentsList) {
+            taskCommentsList.innerHTML = '<p class="text-danger small mb-0">Failed to load comments.</p>';
+          }
+        }
       };
 
       const getStageMeta = (stageId) => state.stageTaskState.get(stageId);
@@ -192,6 +205,45 @@ export async function render(params) {
         Array.from(state.stageTaskState.values())
           .flatMap((meta) => meta.items)
           .map((task) => task.id);
+
+      const renderTaskLabelOptions = (selectedLabelIds = []) => {
+        if (!taskLabelsList) {
+          return;
+        }
+
+        const selectedSet = new Set(selectedLabelIds);
+        if (!state.projectLabels.length) {
+          taskLabelsList.innerHTML = '';
+          setHidden(taskLabelsEmpty, false);
+          return;
+        }
+
+        taskLabelsList.innerHTML = state.projectLabels
+          .map((label) => {
+            const checked = selectedSet.has(label.id) ? ' checked' : '';
+            return `
+              <label class="task-label-option">
+                <input type="checkbox" data-label-id="${escapeHtml(label.id)}"${checked} />
+                <span class="task-label-chip" style="background: ${escapeHtml(label.color)}"></span>
+                <span class="task-label-name">${escapeHtml(label.name)}</span>
+              </label>
+            `;
+          })
+          .join('');
+
+        setHidden(taskLabelsEmpty, true);
+      };
+
+      const getSelectedLabelIds = () => {
+        if (!taskLabelsList) {
+          return [];
+        }
+
+        return Array.from(taskLabelsList.querySelectorAll('input[data-label-id]'))
+          .filter((input) => input.checked)
+          .map((input) => input.getAttribute('data-label-id'))
+          .filter(Boolean);
+      };
 
       const rebuildAttachments = async () => {
         const attachments = await getTaskAttachmentsByTaskIds(listTaskIds());
@@ -203,8 +255,54 @@ export async function render(params) {
         });
       };
 
+      const rebuildLabelAssignments = async () => {
+        const assignments = await getTaskLabelAssignments(listTaskIds());
+        state.taskLabelIdsByTaskId = new Map();
+        assignments.forEach((assignment) => {
+          const list = state.taskLabelIdsByTaskId.get(assignment.task_id) ?? [];
+          list.push(assignment.label_id);
+          state.taskLabelIdsByTaskId.set(assignment.task_id, list);
+        });
+      };
+
+      const refreshTaskMetadata = async () => {
+        await rebuildAttachments();
+        await rebuildCommentCounts();
+        await rebuildLabelAssignments();
+      };
+
+      const rebuildCommentCounts = async () => {
+        const taskIds = listTaskIds();
+        if (taskIds.length === 0) {
+          state.commentCountsByTaskId = new Map();
+          return;
+        }
+        
+        const counts = await getTaskCommentCounts(taskIds);
+        state.commentCountsByTaskId = new Map();
+        counts.forEach((entry) => {
+          state.commentCountsByTaskId.set(entry.task_id, entry.count);
+        });
+      };
+
       const buildTaskCardHtml = (task, stageId) => {
         const attachments = state.attachmentsByTaskId.get(task.id) ?? [];
+        const commentCount = state.commentCountsByTaskId.get(task.id) ?? 0;
+        const labelIds = state.taskLabelIdsByTaskId.get(task.id) ?? [];
+        const labels = labelIds.map((labelId) => state.labelsById.get(labelId)).filter(Boolean);
+        const commentBadge = commentCount > 0 
+          ? `<span class="badge bg-info text-dark ms-2">💬 ${commentCount}</span>` 
+          : '';
+        const labelsHtml = labels.length
+          ? `<div class="task-card__labels">${labels
+              .map((label) => {
+                return `<span class="task-card__label" style="background: ${escapeHtml(label.color)}">${escapeHtml(
+                  label.name
+                )}</span>`;
+              })
+              .join('')}</div>`
+          : '';
+        
         const attachmentHtml = attachments.length
           ? `<div class="task-card__attachments">${attachments
               .map((attachment) => {
@@ -222,7 +320,7 @@ export async function render(params) {
         return `
           <article class="task-card" draggable="true" data-task-card="${task.id}" data-task-id="${task.id}" data-stage-id="${stageId}">
             <div class="task-card__header">
-              <h3 class="task-card__title">${escapeHtml(task.title)}</h3>
+              <h3 class="task-card__title">${escapeHtml(task.title)}${commentBadge}</h3>
               <div class="task-card__actions">
                 <button class="btn btn-sm btn-outline-secondary" type="button" data-discuss-task="${task.id}" data-stage-id="${stageId}">Discuss</button>
                 <button class="btn btn-sm btn-outline-primary" type="button" data-edit-task="${task.id}" data-stage-id="${stageId}">Edit</button>
@@ -231,6 +329,7 @@ export async function render(params) {
             </div>
             <p class="task-card__description">${escapeHtml(task.description || 'No description.')}</p>
             <p class="task-card__description">Responsible: ${escapeHtml(getDisplayName(task.assignee_id))}</p>
+            ${labelsHtml}
             ${attachmentHtml}
           </article>
         `;
@@ -326,6 +425,21 @@ export async function render(params) {
               list.push(attachment);
               state.attachmentsByTaskId.set(attachment.task_id, list);
             });
+
+            const [newCommentCounts, newAssignments] = await Promise.all([
+              getTaskCommentCounts(newTaskIds),
+              getTaskLabelAssignments(newTaskIds)
+            ]);
+
+            newCommentCounts.forEach((entry) => {
+              state.commentCountsByTaskId.set(entry.task_id, entry.count);
+            });
+
+            newAssignments.forEach((assignment) => {
+              const list = state.taskLabelIdsByTaskId.get(assignment.task_id) ?? [];
+              list.push(assignment.label_id);
+              state.taskLabelIdsByTaskId.set(assignment.task_id, list);
+            });
           }
         } finally {
           meta.loading = false;
@@ -352,6 +466,7 @@ export async function render(params) {
 
       const preloadInitialStageTasks = async () => {
         await Promise.all(state.stages.map((stage) => loadMoreStageTasks(stage.id, { rerender: false })));
+        await refreshTaskMetadata();
         renderBoard();
       };
 
@@ -376,7 +491,7 @@ export async function render(params) {
             }
           }
 
-          await rebuildAttachments();
+          await refreshTaskMetadata();
           renderBoard();
         } finally {
           state.isReloadingTasks = false;
@@ -501,6 +616,7 @@ export async function render(params) {
           taskDescriptionInput.value = '';
         }
         renderAssigneeOptions('');
+        renderTaskLabelOptions([]);
         if (taskDoneInput) {
           taskDoneInput.checked = false;
         }
@@ -542,6 +658,7 @@ export async function render(params) {
           taskDescriptionInput.value = task.description ?? '';
         }
         renderAssigneeOptions(task.assignee_id ?? '');
+        renderTaskLabelOptions(state.taskLabelIdsByTaskId.get(task.id) ?? []);
         if (taskDoneInput) {
           taskDoneInput.checked = Boolean(task.done);
         }
@@ -574,7 +691,6 @@ export async function render(params) {
 
         try {
           const projectUsers = await getProjectUsers(params.id);
-          console.log('Loaded project users:', projectUsers);
           state.projectUsers = projectUsers || [];
           state.userEmailById = new Map(
             (projectUsers || []).map((entry) => [
@@ -583,9 +699,17 @@ export async function render(params) {
             ])
           );
         } catch (error) {
-          console.error('Failed to load project users:', error);
           state.projectUsers = [];
           state.userEmailById = new Map();
+        }
+
+        try {
+          const labels = await getProjectLabels(params.id);
+          state.projectLabels = labels;
+          state.labelsById = new Map(labels.map((label) => [label.id, label]));
+        } catch (error) {
+          state.projectLabels = [];
+          state.labelsById = new Map();
         }
 
         state.stages = await getProjectStages(params.id);
@@ -641,6 +765,18 @@ export async function render(params) {
       manageTeamLink?.addEventListener('click', (event) => {
         event.preventDefault();
         window.location.href = `/projects/${params.id}/users`;
+      });
+
+      manageLabelsLinks.forEach((link) => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          window.location.href = `/projects/${params.id}/labels`;
+        });
+      });
+
+      viewLabelsLink?.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.location.href = `/projects/${params.id}/labels`;
       });
 
       board?.addEventListener('click', async (event) => {
@@ -782,7 +918,6 @@ export async function render(params) {
       });
 
       taskForm?.addEventListener('submit', async (event) => {
-        console.log('!!! FORM SUBMIT EVENT TRIGGERED !!!');
         event.preventDefault();
         showTaskFormError('');
 
@@ -800,19 +935,8 @@ export async function render(params) {
         
         const done = Boolean(taskDoneInput?.checked);
         const selectedFiles = Array.from(taskFilesInput?.files ?? []);
+        const selectedLabelIds = getSelectedLabelIds();
         
-        console.log('=== TASK FORM SUBMIT START ===');
-        console.log('Mode:', mode);
-        console.log('taskAssigneeInput element:', taskAssigneeInput);
-        console.log('Selected index:', taskAssigneeInput?.selectedIndex);
-        console.log('Selected option:', selectedOption);
-        console.log('Selected option value:', selectedOptionValue);
-        console.log('Selected option text:', selectedOption?.text);
-        console.log('Raw assignee value from .value:', rawAssigneeValue);
-        console.log('Parsed assigneeId:', assigneeId);
-        console.log('Is assigneeId null?', assigneeId === null);
-        console.log('Is assigneeId empty string?', assigneeId === '');
-        console.log('typeof assigneeId:', typeof assigneeId);
 
         if (!taskTitle) {
           showTaskFormError('Task title is required.');
@@ -849,21 +973,18 @@ export async function render(params) {
             targetTaskId = createdTask.id;
           }
 
+          if (targetTaskId) {
+            await setTaskLabels(targetTaskId, selectedLabelIds);
+          }
+
           if (selectedFiles.length && targetTaskId) {
             await uploadTaskAttachments(targetTaskId, selectedFiles, state.currentUserId);
           }
 
           taskModal.hide();
-          console.log('Task saved successfully, reloading...');
           await reloadTasks();
-          console.log('Tasks reloaded successfully');
         } catch (error) {
-          console.error('=== TASK SAVE ERROR ===');
-          console.error('Error object:', error);
-          console.error('Error message:', error?.message);
-          console.error('Error details:', JSON.stringify(error, null, 2));
           const errorMessage = error?.message ?? 'Unable to save task.';
-          alert('Save failed: ' + errorMessage);
           showTaskFormError(errorMessage);
         }
       });
@@ -889,6 +1010,8 @@ export async function render(params) {
           }
           showTaskFormError('');
           await loadTaskDiscussion(activeTaskId);
+          await rebuildCommentCounts();
+          renderBoard();
         } catch (error) {
           showTaskFormError(error?.message ?? 'Unable to post comment.');
         }
@@ -910,6 +1033,8 @@ export async function render(params) {
           if (state.activeDiscussionTaskId) {
             await loadTaskDiscussion(state.activeDiscussionTaskId);
           }
+          await rebuildCommentCounts();
+          renderBoard();
         } catch (error) {
           showTaskFormError(error?.message ?? 'Unable to delete comment.');
         }

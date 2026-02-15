@@ -1,0 +1,86 @@
+.labels-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 1.5rem;
+}
+
+.labels-panel,
+.labels-tasks-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(10, 31, 68, 0.08);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.labels-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.label-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  border: 1px solid rgba(10, 31, 68, 0.08);
+  border-radius: 0.7rem;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.label-item.is-active {
+  border-color: rgba(10, 31, 68, 0.25);
+  box-shadow: 0 0 0 1px rgba(10, 31, 68, 0.12);
+}
+
+.label-item__info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label-color {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+}
+
+.label-name {
+  font-weight: 600;
+}
+
+.labels-tasks-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.label-task-card {
+  border-radius: 0.8rem;
+  border: 1px solid rgba(10, 31, 68, 0.08);
+  padding: 0.7rem 0.8rem;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.label-task-card__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.label-task-card__meta {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.label-task-card__desc {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 991px) {
+  .labels-layout {
+    grid-template-columns: 1fr;
+  }
+}

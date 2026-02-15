@@ -76,6 +76,24 @@
   font-size: 0.88rem;
 }
 
+.task-card__labels {
+  margin-top: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.task-card__label {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+
 .task-card__attachments {
   margin-top: 0.55rem;
   display: grid;
@@ -144,4 +162,32 @@
   margin: 0;
   font-size: 0.86rem;
   white-space: pre-wrap;
+}
+
+.task-labels-list {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.task-label-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(10, 31, 68, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.task-label-chip {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.task-label-name {
+  font-weight: 600;
 }

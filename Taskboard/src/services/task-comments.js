@@ -47,3 +47,26 @@ export async function deleteTaskComment(commentId) {
     throw error;
   }
 }
+
+export async function getTaskCommentCounts(taskIds) {
+  if (!taskIds || taskIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('task_comments')
+    .select('task_id')
+    .in('task_id', taskIds);
+
+  if (error) {
+    throw error;
+  }
+
+  const counts = new Map();
+  (data ?? []).forEach((row) => {
+    const count = counts.get(row.task_id) ?? 0;
+    counts.set(row.task_id, count + 1);
+  });
+
+  return Array.from(counts.entries()).map(([task_id, count]) => ({ task_id, count }));
+}
