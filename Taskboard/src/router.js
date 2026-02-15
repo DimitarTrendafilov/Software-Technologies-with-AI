@@ -8,6 +8,7 @@ const routes = [
   { path: '/projects', load: () => import('./pages/projects/projects.js') },
   { path: '/project/:id/add', load: () => import('./pages/project-form/project-form.js') },
   { path: '/project/:id/edit', load: () => import('./pages/project-form/project-form.js') },
+  { path: '/project/:id/tasks', load: () => import('./pages/project-tasks/project-tasks.js') },
   { path: '/projects/:id/tasks', load: () => import('./pages/project-tasks/project-tasks.js') },
   { path: '/404', load: () => import('./pages/not-found/not-found.js') }
 ];

@@ -86,7 +86,7 @@ export async function render() {
                   <td>${counts.doneTasks}</td>
                   <td>${counts.stages}</td>
                   <td class="text-end projects-actions">
-                    <a class="btn btn-sm btn-outline-secondary" href="/projects/${project.id}/tasks" data-link>View Tasks</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="/project/${project.id}/tasks" data-link>View Tasks</a>
                     <a class="btn btn-sm btn-outline-primary" href="/project/${project.id}/edit" data-link>Edit</a>
                     <button class="btn btn-sm btn-outline-danger" type="button" data-delete-project="${project.id}" data-project-title="${project.title}">Delete</button>
                   </td>

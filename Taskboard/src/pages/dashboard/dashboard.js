@@ -58,7 +58,7 @@ export async function render() {
                 </div>
                 <h3 class="h5 section-title">${project.title}</h3>
                 <p>${project.description || 'No description yet.'}</p>
-                <a class="stretched-link" href="/projects/${project.id}/tasks" data-link>View tasks</a>
+                <a class="stretched-link" href="/project/${project.id}/tasks" data-link>View tasks</a>
               </article>
             </div>
           `
