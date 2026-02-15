@@ -142,7 +142,7 @@ create policy "Users can view tasks in their projects"
   on public.tasks for select
   using (
     public.user_owns_project(
-      public.project_id_from_task(id)
+      public.project_id_from_stage(stage_id)
     )
   );
 
@@ -150,7 +150,7 @@ create policy "Users can create tasks in their projects"
   on public.tasks for insert
   with check (
     public.user_owns_project(
-      public.project_id_from_task(id)
+      public.project_id_from_stage(stage_id)
     )
   );
 
@@ -158,12 +158,12 @@ create policy "Users can update tasks in their projects"
   on public.tasks for update
   using (
     public.user_owns_project(
-      public.project_id_from_task(id)
+      public.project_id_from_stage(stage_id)
     )
   )
   with check (
     public.user_owns_project(
-      public.project_id_from_task(id)
+      public.project_id_from_stage(stage_id)
     )
   );
 
@@ -171,6 +171,6 @@ create policy "Users can delete tasks in their projects"
   on public.tasks for delete
   using (
     public.user_owns_project(
-      public.project_id_from_task(id)
+      public.project_id_from_stage(stage_id)
     )
   );
