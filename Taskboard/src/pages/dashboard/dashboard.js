@@ -87,15 +87,18 @@ export async function render() {
         }
 
         try {
-          const [projects, tasks] = await Promise.all([
-            getProjects(),
-            getAllUserTasks()
-          ]);
-          
+          const projects = await getProjects();
           renderProjects(projects);
-          updateStatistics(projects, tasks);
           setHidden(emptyState, projects.length > 0);
           setHidden(statsSection, false);
+
+          try {
+            const tasks = await getAllUserTasks();
+            updateStatistics(projects, tasks);
+          } catch (tasksError) {
+            updateStatistics(projects, []);
+            showErrorToast('Projects loaded. Tasks are temporarily unavailable until DB policy update is applied.');
+          }
         } catch (error) {
           showError(error?.message ?? 'Unable to load projects.');
         }

@@ -18,9 +18,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 });
 
 const testUsers = [
-  { email: 'steve@gmail.com', password: 'pass123' },
-  { email: 'maria@gmail.com', password: 'pass123' },
-  { email: 'peter@gmail.com', password: 'pass123' }
+  { email: 'steve@gmail.com', password: '123456' },
+  { email: 'maria@gmail.com', password: '123456' },
+  { email: 'peter@gmail.com', password: '123456' }
 ];
 
 async function checkAndFixUsers() {
@@ -78,7 +78,7 @@ async function checkAndFixUsers() {
       }
 
       // Reset password to make sure it's correct
-      console.log('  🔄 Resetting password to "pass123"...');
+      console.log('  🔄 Resetting password to "123456"...');
       
       const { error: passwordError } = await supabase.auth.admin.updateUserById(
         existingUser.id,

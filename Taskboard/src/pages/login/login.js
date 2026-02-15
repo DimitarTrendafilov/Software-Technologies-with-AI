@@ -56,8 +56,8 @@ export async function render() {
         setHidden(success, true);
         setHidden(errorBox, true);
 
-        const email = form.querySelector('#email')?.value?.trim();
-        const password = form.querySelector('#password')?.value;
+        const email = form.querySelector('#email')?.value?.trim()?.toLowerCase();
+        const password = form.querySelector('#password')?.value?.trim();
 
         if (!email || !password) {
           showError('Email and password are required.');
@@ -76,7 +76,13 @@ export async function render() {
             navigateTo('/dashboard');
           }
         } catch (error) {
-          showError(error?.message ?? 'Authentication failed.');
+          const message = error?.message ?? 'Authentication failed.';
+          if (message.includes('Invalid login credentials')) {
+            showError('Invalid login credentials. Check keyboard layout (EN/BG) and try again. Test users password: 123456');
+            return;
+          }
+
+          showError(message);
         }
       });
 

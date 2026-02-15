@@ -18,9 +18,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 });
 
 const testUsers = [
-  { email: 'steve@gmail.com', password: 'pass123' },
-  { email: 'maria@gmail.com', password: 'pass123' },
-  { email: 'peter@gmail.com', password: 'pass123' }
+  { email: 'steve@gmail.com', password: '123456' },
+  { email: 'maria@gmail.com', password: '123456' },
+  { email: 'peter@gmail.com', password: '123456' }
 ];
 
 async function recreateUsers() {
