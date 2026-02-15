@@ -1,0 +1,23 @@
+.projects-table-wrap {
+  padding: 0;
+  overflow: hidden;
+}
+
+.projects-table th,
+.projects-table td {
+  padding: 0.9rem 1rem;
+  vertical-align: middle;
+}
+
+.projects-table th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.projects-title {
+  font-weight: 600;
+}
+
+.projects-actions {
+  white-space: nowrap;
+}

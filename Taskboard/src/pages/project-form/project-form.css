@@ -1,0 +1,4 @@
+.form-control,
+textarea.form-control {
+  border-radius: 0.8rem;
+}
