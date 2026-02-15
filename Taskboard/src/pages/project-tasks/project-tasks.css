@@ -76,6 +76,30 @@
   font-size: 0.88rem;
 }
 
+.task-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+
+.task-card__due-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(13, 110, 253, 0.12);
+  color: #0d6efd;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.task-card__due-date--overdue {
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+}
+
 .task-card__labels {
   margin-top: 0.4rem;
   display: flex;
@@ -98,6 +122,13 @@
   margin-top: 0.55rem;
   display: grid;
   gap: 0.2rem;
+}
+
+.task-card__labels {
+  margin-top: 0.45rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
 }
 
 .task-card__attachment {

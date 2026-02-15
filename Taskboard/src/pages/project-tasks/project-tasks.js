@@ -68,6 +68,7 @@ export async function render(params) {
       const taskIdInput = document.querySelector('[data-task-id]');
       const taskTitleInput = document.querySelector('#task-title');
       const taskDescriptionInput = document.querySelector('#task-description');
+      const taskDueDateInput = document.querySelector('[data-task-due-date]');
       const taskAssigneeInput = document.querySelector('[data-task-assignee]');
       const taskDoneInput = document.querySelector('#task-done');
       const taskFilesInput = document.querySelector('[data-task-files]');
@@ -80,6 +81,7 @@ export async function render(params) {
       const taskLabelsList = document.querySelector('[data-task-labels-list]');
       const taskLabelsEmpty = document.querySelector('[data-task-labels-empty]');
       const filterMyTasksCheckbox = document.querySelector('[data-filter-my-tasks]');
+      const viewDeadlinesLink = document.querySelector('[data-view-deadlines-link]');
       const manageLabelsLinks = document.querySelectorAll('[data-manage-labels-link]');
       const viewLabelsLink = document.querySelector('[data-view-labels-link]');
       const manageTeamLink = document.querySelector('[data-manage-team-link]');
@@ -119,6 +121,48 @@ export async function render(params) {
         }
 
         return parsed.toLocaleString();
+      };
+
+      const formatDueDateForInput = (value) => {
+        if (!value) {
+          return '';
+        }
+
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) {
+          return '';
+        }
+
+        return parsed.toISOString().slice(0, 10);
+      };
+
+      const formatDueDateLabel = (value) => {
+        if (!value) {
+          return '';
+        }
+
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) {
+          return '';
+        }
+
+        return parsed.toLocaleDateString();
+      };
+
+      const isOverdue = (value) => {
+        if (!value) {
+          return false;
+        }
+
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) {
+          return false;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        parsed.setHours(0, 0, 0, 0);
+        return parsed < today;
       };
 
       const getDisplayName = (userId) => {
@@ -290,8 +334,13 @@ export async function render(params) {
         const commentCount = state.commentCountsByTaskId.get(task.id) ?? 0;
         const labelIds = state.taskLabelIdsByTaskId.get(task.id) ?? [];
         const labels = labelIds.map((labelId) => state.labelsById.get(labelId)).filter(Boolean);
+        const dueDateLabel = formatDueDateLabel(task.due_date);
+        const dueDateClass = isOverdue(task.due_date) && !task.done ? ' task-card__due-date--overdue' : '';
         const commentBadge = commentCount > 0 
           ? `<span class="badge bg-info text-dark ms-2">💬 ${commentCount}</span>` 
+          : '';
+        const dueDateHtml = dueDateLabel
+          ? `<span class="task-card__due-date${dueDateClass}">Due ${escapeHtml(dueDateLabel)}</span>`
           : '';
         const labelsHtml = labels.length
           ? `<div class="task-card__labels">${labels
@@ -328,7 +377,10 @@ export async function render(params) {
               </div>
             </div>
             <p class="task-card__description">${escapeHtml(task.description || 'No description.')}</p>
-            <p class="task-card__description">Responsible: ${escapeHtml(getDisplayName(task.assignee_id))}</p>
+            <div class="task-card__meta">
+              <span class="task-card__description">Responsible: ${escapeHtml(getDisplayName(task.assignee_id))}</span>
+              ${dueDateHtml}
+            </div>
             ${labelsHtml}
             ${attachmentHtml}
           </article>
@@ -615,6 +667,9 @@ export async function render(params) {
         if (taskDescriptionInput) {
           taskDescriptionInput.value = '';
         }
+        if (taskDueDateInput) {
+          taskDueDateInput.value = '';
+        }
         renderAssigneeOptions('');
         renderTaskLabelOptions([]);
         if (taskDoneInput) {
@@ -656,6 +711,9 @@ export async function render(params) {
         }
         if (taskDescriptionInput) {
           taskDescriptionInput.value = task.description ?? '';
+        }
+        if (taskDueDateInput) {
+          taskDueDateInput.value = formatDueDateForInput(task.due_date);
         }
         renderAssigneeOptions(task.assignee_id ?? '');
         renderTaskLabelOptions(state.taskLabelIdsByTaskId.get(task.id) ?? []);
@@ -777,6 +835,11 @@ export async function render(params) {
       viewLabelsLink?.addEventListener('click', (event) => {
         event.preventDefault();
         window.location.href = `/projects/${params.id}/labels`;
+      });
+
+      viewDeadlinesLink?.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.location.href = `/projects/${params.id}/deadlines`;
       });
 
       board?.addEventListener('click', async (event) => {
@@ -926,13 +989,8 @@ export async function render(params) {
         const taskId = String(taskIdInput?.value ?? '').trim();
         const taskTitle = String(taskTitleInput?.value ?? '').trim();
         const taskDescription = String(taskDescriptionInput?.value ?? '').trim();
-        
-        // Get assignee value with detailed logging
-        const rawAssigneeValue = taskAssigneeInput?.value;
-        const selectedOption = taskAssigneeInput?.options?.[taskAssigneeInput.selectedIndex];
-        const selectedOptionValue = selectedOption?.value;
-        const assigneeId = rawAssigneeValue && String(rawAssigneeValue).trim() ? String(rawAssigneeValue).trim() : null;
-        
+        const dueDate = String(taskDueDateInput?.value ?? '').trim() || null;
+        const assigneeId = String(taskAssigneeInput?.value ?? '').trim() || null;
         const done = Boolean(taskDoneInput?.checked);
         const selectedFiles = Array.from(taskFilesInput?.files ?? []);
         const selectedLabelIds = getSelectedLabelIds();
@@ -948,28 +1006,26 @@ export async function render(params) {
 
           if (mode === 'edit' && taskId) {
             const existingTask = (getStageMeta(stageId)?.items ?? []).find((task) => task.id === taskId);
-            console.log('Updating task with assigneeId:', assigneeId);
-            const updated = await updateTask(taskId, {
+            await updateTask(taskId, {
               title: taskTitle,
               description: taskDescription,
               assigneeId,
+              dueDate,
               done,
               position: existingTask?.position ?? 0,
               stageId
             });
-            console.log('Updated task result:', updated);
             targetTaskId = taskId;
           } else {
             const nextPosition = getStageMeta(stageId)?.total ?? 0;
-            console.log('Creating task with assigneeId:', assigneeId);
             const createdTask = await createTask(stageId, {
               title: taskTitle,
               description: taskDescription,
               assigneeId,
+              dueDate,
               done,
               position: nextPosition
             });
-            console.log('Created task result:', createdTask);
             targetTaskId = createdTask.id;
           }
 

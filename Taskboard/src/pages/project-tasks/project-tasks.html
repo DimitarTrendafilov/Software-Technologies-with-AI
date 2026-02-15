@@ -9,6 +9,7 @@
         <input class="form-check-input" type="checkbox" id="filter-my-tasks" data-filter-my-tasks />
         <label class="form-check-label ms-2" for="filter-my-tasks">Only my tasks</label>
       </div>
+      <a class="btn btn-outline-secondary" data-view-deadlines-link>Deadlines view</a>
       <a class="btn btn-outline-secondary" data-view-labels-link>Labels view</a>
       <a class="btn btn-outline-secondary" data-manage-team-link>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16" style="margin-bottom: 2px;">
@@ -52,6 +53,10 @@
             <div class="mb-3">
               <label class="form-label" for="task-description">Description</label>
               <textarea class="form-control" id="task-description" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="task-due-date">Due date</label>
+              <input class="form-control" id="task-due-date" name="dueDate" type="date" data-task-due-date />
             </div>
             <div class="mb-3">
               <label class="form-label" for="task-assignee">Responsible person</label>

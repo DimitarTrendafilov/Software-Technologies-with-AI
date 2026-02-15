@@ -61,7 +61,7 @@ export async function deleteProjectStage(stageId) {
 export async function getTasks(stageId) {
   const { data, error } = await supabase
     .from('tasks')
-    .select('id, stage_id, assignee_id, title, description, position, done, created_at, updated_at')
+    .select('id, stage_id, assignee_id, title, description, due_date, position, done, created_at, updated_at')
     .eq('stage_id', stageId)
     .order('position', { ascending: true });
 
@@ -78,7 +78,7 @@ export async function getTasksPage(stageId, { offset = 0, limit = 30 } = {}) {
 
   const { data, count, error } = await supabase
     .from('tasks')
-    .select('id, stage_id, assignee_id, title, description, position, done, created_at, updated_at', { count: 'exact' })
+    .select('id, stage_id, assignee_id, title, description, due_date, position, done, created_at, updated_at', { count: 'exact' })
     .eq('stage_id', stageId)
     .order('position', { ascending: true })
     .range(from, to);
@@ -97,7 +97,7 @@ export async function getTasksPage(stageId, { offset = 0, limit = 30 } = {}) {
   };
 }
 
-export async function createTask(stageId, { title, description, position, done, assigneeId }) {
+export async function createTask(stageId, { title, description, position, done, assigneeId, dueDate }) {
   const { data, error } = await supabase
     .from('tasks')
     .insert({
@@ -105,10 +105,11 @@ export async function createTask(stageId, { title, description, position, done, 
       assignee_id: assigneeId ?? null,
       title,
       description,
+      due_date: dueDate ?? null,
       position: position ?? 0,
       done: done ?? false
     })
-    .select('id, stage_id, assignee_id, title, description, position, done, created_at, updated_at')
+    .select('id, stage_id, assignee_id, title, description, due_date, position, done, created_at, updated_at')
     .single();
 
   if (error) {
@@ -118,7 +119,7 @@ export async function createTask(stageId, { title, description, position, done, 
   return data;
 }
 
-export async function updateTask(taskId, { title, description, position, done, stageId, assigneeId }) {
+export async function updateTask(taskId, { title, description, position, done, stageId, assigneeId, dueDate }) {
   const payload = {};
 
   if (title !== undefined) {
@@ -139,12 +140,15 @@ export async function updateTask(taskId, { title, description, position, done, s
   if (assigneeId !== undefined) {
     payload.assignee_id = assigneeId;
   }
+  if (dueDate !== undefined) {
+    payload.due_date = dueDate;
+  }
 
   const { data, error } = await supabase
     .from('tasks')
     .update(payload)
     .eq('id', taskId)
-    .select('id, stage_id, assignee_id, title, description, position, done, created_at, updated_at')
+    .select('id, stage_id, assignee_id, title, description, due_date, position, done, created_at, updated_at')
     .single();
 
   if (error) {
@@ -163,6 +167,23 @@ export async function deleteTask(taskId) {
   if (error) {
     throw error;
   }
+}
+
+export async function getProjectTasksForDeadlines(projectId) {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(
+      'id, title, description, stage_id, assignee_id, due_date, done, position, project_stages!inner(id, name, project_id)'
+    )
+    .eq('project_stages.project_id', projectId)
+    .order('due_date', { ascending: true, nullsFirst: false })
+    .order('position', { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
 }
 
 export async function getAllUserTasks() {
