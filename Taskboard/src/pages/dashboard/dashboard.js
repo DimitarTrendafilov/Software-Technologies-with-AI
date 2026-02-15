@@ -3,6 +3,7 @@ import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser } from '../../services/auth.js';
 import { createProject, getProjects } from '../../services/projects.js';
 import { setHidden, setText } from '../../utils/dom.js';
+import { showSuccess, showError as showErrorToast } from '../../services/toast.js';
 
 export async function render() {
   const html = await loadHtml(new URL('./dashboard.html', import.meta.url));
@@ -22,6 +23,9 @@ export async function render() {
       const showError = (message) => {
         setText(errorBox, message);
         setHidden(errorBox, !message);
+        if (message) {
+          showErrorToast(message);
+        }
       };
 
       const renderProjects = (projects) => {
@@ -103,6 +107,7 @@ export async function render() {
 
         try {
           await createProject({ title: name, description, userId: user.id });
+          showSuccess('Project created successfully!');
           form.reset();
           toggleForm(false);
           setText(feedback, '');

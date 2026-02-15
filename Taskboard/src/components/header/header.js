@@ -2,6 +2,7 @@ import './header.css';
 import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser, signOut } from '../../services/auth.js';
 import { setHidden, setText } from '../../utils/dom.js';
+import { showError } from '../../services/toast.js';
 
 export async function renderHeader() {
   return loadHtml(new URL('./header.html', import.meta.url));
@@ -23,7 +24,7 @@ export async function mountHeader() {
       try {
         await signOut();
       } catch (error) {
-        console.error(error);
+        showError(error?.message ?? 'Failed to sign out.');
       }
     });
   }

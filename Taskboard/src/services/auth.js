@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+import { navigateTo } from '../utils/navigation.js';
 
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
@@ -32,6 +33,9 @@ export async function signOut() {
   if (error) {
     throw error;
   }
+  
+  // Navigate to home page after logout
+  navigateTo('/');
 }
 
 export function initAuthEvents() {

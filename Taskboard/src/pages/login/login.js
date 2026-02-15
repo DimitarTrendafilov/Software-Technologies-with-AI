@@ -3,6 +3,7 @@ import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser, signInWithPassword, signUpWithPassword } from '../../services/auth.js';
 import { setHidden, setText } from '../../utils/dom.js';
 import { navigateTo } from '../../utils/navigation.js';
+import { showSuccess, showError } from '../../services/toast.js';
 
 export async function render() {
   const html = await loadHtml(new URL('./login.html', import.meta.url));
@@ -59,23 +60,23 @@ export async function render() {
         const password = form.querySelector('#password')?.value;
 
         if (!email || !password) {
-          setText(errorBox, 'Email and password are required.');
-          setHidden(errorBox, false);
+          showError('Email and password are required.');
           return;
         }
 
         try {
           if (mode === 'signup') {
             await signUpWithPassword(email, password);
-            setText(success, 'Account created. Check your email to confirm if required.');
-            setHidden(success, false);
+            showSuccess('Account created successfully! You can now sign in.');
+            // Switch to sign-in mode
+            setMode('signin');
+            form.reset();
           } else {
             await signInWithPassword(email, password);
             navigateTo('/dashboard');
           }
         } catch (error) {
-          setText(errorBox, error?.message ?? 'Authentication failed.');
-          setHidden(errorBox, false);
+          showError(error?.message ?? 'Authentication failed.');
         }
       });
 

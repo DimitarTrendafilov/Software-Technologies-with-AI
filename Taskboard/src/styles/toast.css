@@ -1,0 +1,68 @@
+/* Toast notifications styling */
+.toast-container {
+  max-width: 400px;
+  width: 100%;
+}
+
+.toast {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.toast-body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+}
+
+.toast-icon {
+  font-size: 1.25rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.toast-message {
+  flex: 1;
+}
+
+.toast .btn-close-white {
+  opacity: 0.8;
+}
+
+.toast .btn-close-white:hover {
+  opacity: 1;
+}
+
+/* Animation */
+.toast.showing {
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+.toast.hide {
+  animation: toastSlideOut 0.3s ease-in;
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
