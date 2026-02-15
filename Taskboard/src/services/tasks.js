@@ -61,7 +61,7 @@ export async function deleteProjectStage(stageId) {
 export async function getTasks(stageId) {
   const { data, error } = await supabase
     .from('tasks')
-    .select('id, stage_id, title, description, position, done, created_at, updated_at')
+    .select('id, stage_id, assignee_id, title, description, position, done, created_at, updated_at')
     .eq('stage_id', stageId)
     .order('position', { ascending: true });
 
@@ -78,7 +78,7 @@ export async function getTasksPage(stageId, { offset = 0, limit = 30 } = {}) {
 
   const { data, count, error } = await supabase
     .from('tasks')
-    .select('id, stage_id, title, description, position, done, created_at, updated_at', { count: 'exact' })
+    .select('id, stage_id, assignee_id, title, description, position, done, created_at, updated_at', { count: 'exact' })
     .eq('stage_id', stageId)
     .order('position', { ascending: true })
     .range(from, to);
@@ -97,17 +97,18 @@ export async function getTasksPage(stageId, { offset = 0, limit = 30 } = {}) {
   };
 }
 
-export async function createTask(stageId, { title, description, position, done }) {
+export async function createTask(stageId, { title, description, position, done, assigneeId }) {
   const { data, error } = await supabase
     .from('tasks')
     .insert({
       stage_id: stageId,
+      assignee_id: assigneeId ?? null,
       title,
       description,
       position: position ?? 0,
       done: done ?? false
     })
-    .select('id, stage_id, title, description, position, done, created_at, updated_at')
+    .select('id, stage_id, assignee_id, title, description, position, done, created_at, updated_at')
     .single();
 
   if (error) {
@@ -117,7 +118,7 @@ export async function createTask(stageId, { title, description, position, done }
   return data;
 }
 
-export async function updateTask(taskId, { title, description, position, done, stageId }) {
+export async function updateTask(taskId, { title, description, position, done, stageId, assigneeId }) {
   const payload = {};
 
   if (title !== undefined) {
@@ -135,12 +136,15 @@ export async function updateTask(taskId, { title, description, position, done, s
   if (stageId !== undefined) {
     payload.stage_id = stageId;
   }
+  if (assigneeId !== undefined) {
+    payload.assignee_id = assigneeId;
+  }
 
   const { data, error } = await supabase
     .from('tasks')
     .update(payload)
     .eq('id', taskId)
-    .select('id, stage_id, title, description, position, done, created_at, updated_at')
+    .select('id, stage_id, assignee_id, title, description, position, done, created_at, updated_at')
     .single();
 
   if (error) {
@@ -195,7 +199,7 @@ export async function getAllUserTasks() {
   // Get all tasks for these stages
   const { data: tasks, error: tasksError } = await supabase
     .from('tasks')
-    .select('id, title, description, done, created_at, updated_at, stage_id')
+    .select('id, title, description, done, created_at, updated_at, stage_id, assignee_id')
     .in('stage_id', stageIds);
 
   if (tasksError) {

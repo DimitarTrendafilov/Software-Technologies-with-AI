@@ -4,6 +4,8 @@ import { getCurrentUser } from '../../services/auth.js';
 import { getProject } from '../../services/projects.js';
 import { createTask, deleteTask, getProjectStages, getTasks, getTasksPage, updateTask } from '../../services/tasks.js';
 import { getTaskAttachmentsByTaskIds, uploadTaskAttachments } from '../../services/task-attachments.js';
+import { getTaskComments, createTaskComment, deleteTaskComment } from '../../services/task-comments.js';
+import { getProjectUsers } from '../../services/project-members.js';
 import { supabase } from '../../services/supabase.js';
 import { setHidden, setText } from '../../utils/dom.js';
 import { showError } from '../../services/toast.js';
@@ -41,7 +43,11 @@ export async function render(params) {
         realtimeReloadTimer: null,
         isReloadingTasks: false,
         currentUserId: null,
-        attachmentsByTaskId: new Map()
+        attachmentsByTaskId: new Map(),
+        userEmailById: new Map(),
+        activeDiscussionTaskId: null,
+        projectUsers: [],
+        filterMyTasks: false
       };
 
       const title = document.querySelector('[data-project-title]');
@@ -57,10 +63,16 @@ export async function render(params) {
       const taskIdInput = document.querySelector('[data-task-id]');
       const taskTitleInput = document.querySelector('#task-title');
       const taskDescriptionInput = document.querySelector('#task-description');
+      const taskAssigneeInput = document.querySelector('[data-task-assignee]');
       const taskDoneInput = document.querySelector('#task-done');
       const taskFilesInput = document.querySelector('[data-task-files]');
       const deleteTaskTitle = document.querySelector('[data-delete-task-title]');
       const confirmDeleteTaskBtn = document.querySelector('[data-confirm-delete-task]');
+      const taskDiscussion = document.querySelector('[data-task-discussion]');
+      const taskCommentsList = document.querySelector('[data-task-comments-list]');
+      const taskCommentForm = document.querySelector('[data-task-comment-form]');
+      const taskCommentInput = document.querySelector('[data-task-comment-input]');
+      const filterMyTasksCheckbox = document.querySelector('[data-filter-my-tasks]');
 
       const taskModal = new Modal(document.getElementById('taskFormModal'));
       const deleteModal = new Modal(document.getElementById('taskDeleteModal'));
@@ -84,6 +96,91 @@ export async function render(params) {
       const showTaskFormError = (message) => {
         setText(taskFormError, message);
         setHidden(taskFormError, !message);
+      };
+
+      const formatCommentTimestamp = (value) => {
+        if (!value) {
+          return '';
+        }
+
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) {
+          return '';
+        }
+
+        return parsed.toLocaleString();
+      };
+
+      const getDisplayName = (userId) => {
+        if (!userId) {
+          return 'Unassigned';
+        }
+        if (userId === state.currentUserId) {
+          return 'You';
+        }
+
+        return state.userEmailById.get(userId) ?? 'Unknown user';
+      };
+
+      const renderAssigneeOptions = (selectedUserId = '') => {
+        if (!taskAssigneeInput) {
+          return;
+        }
+
+        const selected = String(selectedUserId ?? '');
+        taskAssigneeInput.innerHTML = [
+          '<option value="">Unassigned</option>',
+          ...state.projectUsers.map((entry) => {
+            const value = String(entry.user_id ?? '');
+            const isSelected = value === selected ? ' selected' : '';
+            return `<option value="${escapeHtml(value)}"${isSelected}>${escapeHtml(entry.email ?? 'Unknown user')}</option>`;
+          })
+        ].join('');
+      };
+
+      const renderTaskComments = (comments) => {
+        if (!taskCommentsList) {
+          return;
+        }
+
+        if (!comments?.length) {
+          taskCommentsList.innerHTML = '<p class="text-muted small mb-0">No comments yet.</p>';
+          return;
+        }
+
+        taskCommentsList.innerHTML = comments
+          .map((comment) => {
+            const canDelete = comment.author_id === state.currentUserId;
+            return `
+              <article class="task-comment-item">
+                <div class="task-comment-item__meta">
+                  <span class="task-comment-item__author">${escapeHtml(getDisplayName(comment.author_id))}</span>
+                  <span class="task-comment-item__time">${escapeHtml(formatCommentTimestamp(comment.created_at))}</span>
+                </div>
+                <p class="task-comment-item__content">${escapeHtml(comment.content)}</p>
+                ${
+                  canDelete
+                    ? `<div class="d-flex justify-content-end mt-2"><button class="btn btn-sm btn-outline-danger" type="button" data-delete-comment="${comment.id}">Delete</button></div>`
+                    : ''
+                }
+              </article>
+            `;
+          })
+          .join('');
+      };
+
+      const loadTaskDiscussion = async (taskId) => {
+        if (!taskId) {
+          return;
+        }
+
+        state.activeDiscussionTaskId = taskId;
+        if (taskCommentsList) {
+          taskCommentsList.innerHTML = '<p class="text-muted small mb-0">Loading comments...</p>';
+        }
+
+        const comments = await getTaskComments(taskId);
+        renderTaskComments(comments);
       };
 
       const getStageMeta = (stageId) => state.stageTaskState.get(stageId);
@@ -124,11 +221,13 @@ export async function render(params) {
             <div class="task-card__header">
               <h3 class="task-card__title">${escapeHtml(task.title)}</h3>
               <div class="task-card__actions">
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-discuss-task="${task.id}" data-stage-id="${stageId}">Discuss</button>
                 <button class="btn btn-sm btn-outline-primary" type="button" data-edit-task="${task.id}" data-stage-id="${stageId}">Edit</button>
                 <button class="btn btn-sm btn-outline-danger" type="button" data-delete-task="${task.id}" data-task-title="${escapeHtml(task.title)}">Delete</button>
               </div>
             </div>
             <p class="task-card__description">${escapeHtml(task.description || 'No description.')}</p>
+            <p class="task-card__description">Responsible: ${escapeHtml(getDisplayName(task.assignee_id))}</p>
             ${attachmentHtml}
           </article>
         `;
@@ -150,7 +249,11 @@ export async function render(params) {
         board.innerHTML = state.stages
           .map((stage) => {
             const meta = getStageMeta(stage.id);
-            const tasks = (meta?.items ?? []).slice().sort((first, second) => (first.position ?? 0) - (second.position ?? 0));
+            let tasks = (meta?.items ?? []).slice().sort((first, second) => (first.position ?? 0) - (second.position ?? 0));
+            
+            if (state.filterMyTasks) {
+              tasks = tasks.filter((task) => task.assignee_id === state.currentUserId);
+            }
 
             const cards = tasks.length
               ? tasks.map((task) => buildTaskCardHtml(task, stage.id)).join('')
@@ -378,6 +481,7 @@ export async function render(params) {
       const openAddModal = (stageId) => {
         setText(taskModalTitle, 'Add Task');
         showTaskFormError('');
+        state.activeDiscussionTaskId = null;
         if (taskForm) {
           taskForm.dataset.mode = 'add';
         }
@@ -393,16 +497,24 @@ export async function render(params) {
         if (taskDescriptionInput) {
           taskDescriptionInput.value = '';
         }
+        renderAssigneeOptions('');
         if (taskDoneInput) {
           taskDoneInput.checked = false;
         }
         if (taskFilesInput) {
           taskFilesInput.value = '';
         }
+        if (taskCommentInput) {
+          taskCommentInput.value = '';
+        }
+        if (taskCommentsList) {
+          taskCommentsList.innerHTML = '<p class="text-muted small mb-0">Save the task first to start discussing.</p>';
+        }
+        setHidden(taskDiscussion, true);
         taskModal.show();
       };
 
-      const openEditModal = (taskId, stageId) => {
+      const openEditModal = async (taskId, stageId) => {
         const task = (getStageMeta(stageId)?.items ?? []).find((entry) => entry.id === taskId);
         if (!task) {
           showInlineError('Task not found in loaded items. Scroll to load more tasks.');
@@ -426,13 +538,19 @@ export async function render(params) {
         if (taskDescriptionInput) {
           taskDescriptionInput.value = task.description ?? '';
         }
+        renderAssigneeOptions(task.assignee_id ?? '');
         if (taskDoneInput) {
           taskDoneInput.checked = Boolean(task.done);
         }
         if (taskFilesInput) {
           taskFilesInput.value = '';
         }
+        if (taskCommentInput) {
+          taskCommentInput.value = '';
+        }
+        setHidden(taskDiscussion, false);
         taskModal.show();
+        await loadTaskDiscussion(task.id);
       };
 
       setHidden(authRequired, true);
@@ -450,6 +568,15 @@ export async function render(params) {
       try {
         const project = await getProject(params.id);
         setText(title, project?.title ?? 'Project');
+
+        try {
+          const projectUsers = await getProjectUsers(params.id);
+          state.projectUsers = projectUsers;
+          state.userEmailById = new Map(projectUsers.map((entry) => [entry.user_id, entry.email ?? 'Unknown user']));
+        } catch {
+          state.projectUsers = [];
+          state.userEmailById = new Map();
+        }
 
         state.stages = await getProjectStages(params.id);
         if (!state.stages.length) {
@@ -496,7 +623,12 @@ export async function render(params) {
         showInlineError(error?.message ?? 'Unable to load project tasks.');
       }
 
-      board?.addEventListener('click', (event) => {
+      filterMyTasksCheckbox?.addEventListener('change', () => {
+        state.filterMyTasks = filterMyTasksCheckbox.checked;
+        renderBoard();
+      });
+
+      board?.addEventListener('click', async (event) => {
         const addButton = event.target.closest('[data-add-task]');
         if (addButton) {
           const stageId = addButton.getAttribute('data-add-task');
@@ -506,12 +638,22 @@ export async function render(params) {
           return;
         }
 
+        const discussButton = event.target.closest('[data-discuss-task]');
+        if (discussButton) {
+          const taskId = discussButton.getAttribute('data-discuss-task');
+          const stageId = discussButton.getAttribute('data-stage-id');
+          if (taskId && stageId) {
+            await openEditModal(taskId, stageId);
+          }
+          return;
+        }
+
         const editButton = event.target.closest('[data-edit-task]');
         if (editButton) {
           const taskId = editButton.getAttribute('data-edit-task');
           const stageId = editButton.getAttribute('data-stage-id');
           if (taskId && stageId) {
-            openEditModal(taskId, stageId);
+            await openEditModal(taskId, stageId);
           }
           return;
         }
@@ -633,6 +775,7 @@ export async function render(params) {
         const taskId = String(taskIdInput?.value ?? '').trim();
         const taskTitle = String(taskTitleInput?.value ?? '').trim();
         const taskDescription = String(taskDescriptionInput?.value ?? '').trim();
+        const assigneeId = String(taskAssigneeInput?.value ?? '').trim() || null;
         const done = Boolean(taskDoneInput?.checked);
         const selectedFiles = Array.from(taskFilesInput?.files ?? []);
 
@@ -649,6 +792,7 @@ export async function render(params) {
             await updateTask(taskId, {
               title: taskTitle,
               description: taskDescription,
+              assigneeId,
               done,
               position: existingTask?.position ?? 0,
               stageId
@@ -659,6 +803,7 @@ export async function render(params) {
             const createdTask = await createTask(stageId, {
               title: taskTitle,
               description: taskDescription,
+              assigneeId,
               done,
               position: nextPosition
             });
@@ -673,6 +818,55 @@ export async function render(params) {
           await reloadTasks();
         } catch (error) {
           showTaskFormError(error?.message ?? 'Unable to save task.');
+        }
+      });
+
+      taskCommentForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const activeTaskId = state.activeDiscussionTaskId || String(taskIdInput?.value ?? '').trim();
+        const content = String(taskCommentInput?.value ?? '').trim();
+
+        if (!activeTaskId) {
+          showTaskFormError('Save the task before adding comments.');
+          return;
+        }
+
+        if (!content) {
+          showTaskFormError('Comment cannot be empty.');
+          return;
+        }
+
+        try {
+          await createTaskComment(activeTaskId, content, state.currentUserId);
+          if (taskCommentInput) {
+            taskCommentInput.value = '';
+          }
+          showTaskFormError('');
+          await loadTaskDiscussion(activeTaskId);
+        } catch (error) {
+          showTaskFormError(error?.message ?? 'Unable to post comment.');
+        }
+      });
+
+      taskCommentsList?.addEventListener('click', async (event) => {
+        const deleteButton = event.target.closest('[data-delete-comment]');
+        if (!deleteButton) {
+          return;
+        }
+
+        const commentId = deleteButton.getAttribute('data-delete-comment');
+        if (!commentId) {
+          return;
+        }
+
+        try {
+          await deleteTaskComment(commentId);
+          if (state.activeDiscussionTaskId) {
+            await loadTaskDiscussion(state.activeDiscussionTaskId);
+          }
+        } catch (error) {
+          showTaskFormError(error?.message ?? 'Unable to delete comment.');
         }
       });
 

@@ -107,3 +107,41 @@
   outline-offset: 4px;
   border-radius: 0.8rem;
 }
+
+.task-comments-list {
+  max-height: 240px;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.task-comment-item {
+  border: 1px solid rgba(10, 31, 68, 0.1);
+  border-radius: 0.65rem;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.task-comment-item__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.task-comment-item__author {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.task-comment-item__time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.task-comment-item__content {
+  margin: 0;
+  font-size: 0.86rem;
+  white-space: pre-wrap;
+}
