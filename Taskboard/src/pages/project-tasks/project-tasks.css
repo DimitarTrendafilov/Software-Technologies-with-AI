@@ -44,8 +44,40 @@
   font-weight: 600;
 }
 
+.task-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.task-card__actions {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.task-card__actions .btn {
+  padding: 0.15rem 0.4rem;
+  line-height: 1.1;
+}
+
 .task-card__description {
   margin: 0.45rem 0 0;
   color: var(--text-muted);
   font-size: 0.88rem;
+}
+
+.add-task-btn {
+  min-height: 82px;
+  border: 2px dashed rgba(10, 31, 68, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--text-color);
+  border-radius: 0.9rem;
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.add-task-btn span {
+  font-size: 0.95rem;
+  margin-left: 0.45rem;
 }

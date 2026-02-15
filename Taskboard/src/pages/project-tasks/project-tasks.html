@@ -19,4 +19,56 @@
   <div class="tasks-board-scroll d-none" data-board-scroll>
     <div class="tasks-board" data-stages-board></div>
   </div>
+
+  <div class="modal fade" id="taskFormModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" data-task-modal-title>Add Task</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form data-task-form>
+          <div class="modal-body">
+            <div class="alert alert-danger d-none" role="alert" data-task-form-error></div>
+            <input type="hidden" name="stageId" data-task-stage-id />
+            <input type="hidden" name="taskId" data-task-id />
+            <div class="mb-3">
+              <label class="form-label" for="task-title">Title</label>
+              <input class="form-control" id="task-title" name="title" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="task-description">Description</label>
+              <textarea class="form-control" id="task-description" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="task-done" name="done" />
+              <label class="form-check-label" for="task-done">Completed</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-accent" data-task-submit>Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="taskDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5">Delete Task</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">Delete <strong data-delete-task-title></strong>? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" data-confirm-delete-task>Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
