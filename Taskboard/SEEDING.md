@@ -49,6 +49,25 @@ Without it, the script will still create projects/stages/tasks if the users alre
 npm run seed
 ```
 
+### Bulk seeding for scalability tests
+
+Generate larger datasets with CLI options:
+
+```bash
+npm run seed -- --projects 120 --tasks 120
+```
+
+Options:
+- `--projects` / `-p`: projects per selected user (default: `4`)
+- `--tasks` / `-t`: tasks per project (default: `12`)
+- `--users` / `-u`: comma-separated sample user emails (default: all sample users)
+
+Example for one user only:
+
+```bash
+npm run seed -- --projects 120 --tasks 120 --users steve@gmail.com
+```
+
 This will:
 1. Register (or verify) the three sample users
 2. Create projects, stages, and tasks for each user

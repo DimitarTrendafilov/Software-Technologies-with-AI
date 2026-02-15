@@ -13,6 +13,46 @@ export async function getProjects() {
   return data ?? [];
 }
 
+export async function getProjectsPaged({ page = 1, pageSize = 10 } = {}) {
+  const safePage = Math.max(1, Number(page) || 1);
+  const safePageSize = Math.max(1, Number(pageSize) || 10);
+  const from = (safePage - 1) * safePageSize;
+  const to = from + safePageSize - 1;
+
+  const { data, count, error } = await supabase
+    .from('projects')
+    .select('id, title, description, owner_id, created_at, updated_at', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    items: data ?? [],
+    totalCount: count ?? 0,
+    page: safePage,
+    pageSize: safePageSize
+  };
+}
+
+export async function getProjectSummaries(projectIds) {
+  if (!projectIds?.length) {
+    return [];
+  }
+
+  const { data, error } = await supabase.rpc('get_project_summaries', {
+    project_ids: projectIds
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
 export async function getProject(projectId) {
   const { data, error } = await supabase
     .from('projects')

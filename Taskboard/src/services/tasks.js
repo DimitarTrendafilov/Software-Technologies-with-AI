@@ -72,6 +72,31 @@ export async function getTasks(stageId) {
   return data ?? [];
 }
 
+export async function getTasksPage(stageId, { offset = 0, limit = 30 } = {}) {
+  const from = Math.max(0, offset);
+  const to = from + Math.max(1, limit) - 1;
+
+  const { data, count, error } = await supabase
+    .from('tasks')
+    .select('id, stage_id, title, description, position, done, created_at, updated_at', { count: 'exact' })
+    .eq('stage_id', stageId)
+    .order('position', { ascending: true })
+    .range(from, to);
+
+  if (error) {
+    throw error;
+  }
+
+  const items = data ?? [];
+  const total = count ?? 0;
+
+  return {
+    items,
+    total,
+    hasMore: from + items.length < total
+  };
+}
+
 export async function createTask(stageId, { title, description, position, done }) {
   const { data, error } = await supabase
     .from('tasks')

@@ -2,12 +2,14 @@ import './project-tasks.css';
 import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser } from '../../services/auth.js';
 import { getProject } from '../../services/projects.js';
-import { createTask, deleteTask, getProjectStages, getTasks, updateTask } from '../../services/tasks.js';
+import { createTask, deleteTask, getProjectStages, getTasks, getTasksPage, updateTask } from '../../services/tasks.js';
 import { getTaskAttachmentsByTaskIds, uploadTaskAttachments } from '../../services/task-attachments.js';
 import { supabase } from '../../services/supabase.js';
 import { setHidden, setText } from '../../utils/dom.js';
 import { showError } from '../../services/toast.js';
 import Modal from 'bootstrap/js/dist/modal';
+
+const TASKS_PAGE_SIZE = 30;
 
 let activeTasksChannel = null;
 let activeProjectId = null;
@@ -33,7 +35,7 @@ export async function render(params) {
     async onMount() {
       const state = {
         stages: [],
-        tasksByStage: new Map(),
+        stageTaskState: new Map(),
         deleteTaskId: null,
         drag: null,
         realtimeReloadTimer: null,
@@ -84,68 +86,167 @@ export async function render(params) {
         setHidden(taskFormError, !message);
       };
 
+      const getStageMeta = (stageId) => state.stageTaskState.get(stageId);
+
+      const listTaskIds = () =>
+        Array.from(state.stageTaskState.values())
+          .flatMap((meta) => meta.items)
+          .map((task) => task.id);
+
+      const rebuildAttachments = async () => {
+        const attachments = await getTaskAttachmentsByTaskIds(listTaskIds());
+        state.attachmentsByTaskId = new Map();
+        attachments.forEach((attachment) => {
+          const list = state.attachmentsByTaskId.get(attachment.task_id) ?? [];
+          list.push(attachment);
+          state.attachmentsByTaskId.set(attachment.task_id, list);
+        });
+      };
+
+      const buildTaskCardHtml = (task, stageId) => {
+        const attachments = state.attachmentsByTaskId.get(task.id) ?? [];
+        const attachmentHtml = attachments.length
+          ? `<div class="task-card__attachments">${attachments
+              .map((attachment) => {
+                if (!attachment.url) {
+                  return `<span class="text-muted small">${escapeHtml(attachment.file_name)}</span>`;
+                }
+
+                return `<a class="task-card__attachment" href="${escapeHtml(
+                  attachment.url
+                )}" target="_blank" rel="noopener noreferrer">📎 ${escapeHtml(attachment.file_name)}</a>`;
+              })
+              .join('')}</div>`
+          : '';
+
+        return `
+          <article class="task-card" draggable="true" data-task-card="${task.id}" data-task-id="${task.id}" data-stage-id="${stageId}">
+            <div class="task-card__header">
+              <h3 class="task-card__title">${escapeHtml(task.title)}</h3>
+              <div class="task-card__actions">
+                <button class="btn btn-sm btn-outline-primary" type="button" data-edit-task="${task.id}" data-stage-id="${stageId}">Edit</button>
+                <button class="btn btn-sm btn-outline-danger" type="button" data-delete-task="${task.id}" data-task-title="${escapeHtml(task.title)}">Delete</button>
+              </div>
+            </div>
+            <p class="task-card__description">${escapeHtml(task.description || 'No description.')}</p>
+            ${attachmentHtml}
+          </article>
+        `;
+      };
+
       const renderBoard = () => {
         if (!board) {
           return;
         }
 
+        const scrollPositions = new Map();
+        board.querySelectorAll('[data-stage-list]').forEach((element) => {
+          const stageId = element.getAttribute('data-stage-list');
+          if (stageId) {
+            scrollPositions.set(stageId, element.scrollTop);
+          }
+        });
+
         board.innerHTML = state.stages
           .map((stage) => {
-            const tasks = (state.tasksByStage.get(stage.id) ?? [])
-              .slice()
-              .sort((first, second) => (first.position ?? 0) - (second.position ?? 0));
+            const meta = getStageMeta(stage.id);
+            const tasks = (meta?.items ?? []).slice().sort((first, second) => (first.position ?? 0) - (second.position ?? 0));
 
             const cards = tasks.length
-              ? tasks
-                  .map(
-                    (task) => `
-                        <article class="task-card" draggable="true" data-task-card="${task.id}" data-task-id="${task.id}" data-stage-id="${stage.id}">
-                          <div class="task-card__header">
-                            <h3 class="task-card__title">${escapeHtml(task.title)}</h3>
-                            <div class="task-card__actions">
-                              <button class="btn btn-sm btn-outline-primary" type="button" data-edit-task="${task.id}" data-stage-id="${stage.id}">Edit</button>
-                              <button class="btn btn-sm btn-outline-danger" type="button" data-delete-task="${task.id}" data-task-title="${escapeHtml(task.title)}">Delete</button>
-                            </div>
-                          </div>
-                          <p class="task-card__description">${escapeHtml(task.description || 'No description.')}</p>
-                          ${(() => {
-                            const attachments = state.attachmentsByTaskId.get(task.id) ?? [];
-                            if (!attachments.length) {
-                              return '';
-                            }
-
-                            const links = attachments
-                              .map((attachment) => {
-                                if (!attachment.url) {
-                                  return `<span class="text-muted small">${escapeHtml(attachment.file_name)}</span>`;
-                                }
-
-                                return `<a class="task-card__attachment" href="${escapeHtml(attachment.url)}" target="_blank" rel="noopener noreferrer">📎 ${escapeHtml(attachment.file_name)}</a>`;
-                              })
-                              .join('');
-
-                            return `<div class="task-card__attachments">${links}</div>`;
-                          })()}
-                        </article>
-                      `
-                  )
-                  .join('')
+              ? tasks.map((task) => buildTaskCardHtml(task, stage.id)).join('')
               : '<div class="text-muted small">No tasks in this stage.</div>';
 
+            const loader = meta?.loading
+              ? '<div class="text-muted small">Loading more...</div>'
+              : meta?.hasMore
+                ? '<div class="text-muted small">Scroll for more tasks...</div>'
+                : '';
+
             return `
-                <section class="glass-card tasks-stage">
-                  <div class="tasks-stage__header">
-                    <h2 class="h6 section-title mb-0">${escapeHtml(stage.name)}</h2>
-                    <span class="badge bg-dark-subtle text-dark">${tasks.length}</span>
-                  </div>
-                  <div class="tasks-stage__list" data-stage-list="${stage.id}">
-                    ${cards}
-                    <button class="btn add-task-btn" type="button" data-add-task="${stage.id}">+ <span>Add New Task</span></button>
-                  </div>
-                </section>
-              `;
+              <section class="glass-card tasks-stage">
+                <div class="tasks-stage__header">
+                  <h2 class="h6 section-title mb-0">${escapeHtml(stage.name)}</h2>
+                  <span class="badge bg-dark-subtle text-dark">${meta?.total ?? tasks.length}</span>
+                </div>
+                <div class="tasks-stage__list" data-stage-list="${stage.id}">
+                  ${cards}
+                  ${loader}
+                  <button class="btn add-task-btn" type="button" data-add-task="${stage.id}">+ <span>Add New Task</span></button>
+                </div>
+              </section>
+            `;
           })
           .join('');
+
+        board.querySelectorAll('[data-stage-list]').forEach((element) => {
+          const stageId = element.getAttribute('data-stage-list');
+          if (!stageId) {
+            return;
+          }
+          const previousScroll = scrollPositions.get(stageId);
+          if (typeof previousScroll === 'number') {
+            element.scrollTop = previousScroll;
+          }
+        });
+      };
+
+      const loadMoreStageTasks = async (stageId, { rerender = true } = {}) => {
+        const meta = getStageMeta(stageId);
+        if (!meta || meta.loading || !meta.hasMore) {
+          return;
+        }
+
+        meta.loading = true;
+        if (rerender) {
+          renderBoard();
+        }
+
+        try {
+          const page = await getTasksPage(stageId, {
+            offset: meta.offset,
+            limit: TASKS_PAGE_SIZE
+          });
+
+          meta.items.push(...page.items);
+          meta.offset += page.items.length;
+          meta.total = page.total;
+          meta.hasMore = page.hasMore;
+
+          const newTaskIds = page.items.map((task) => task.id);
+          if (newTaskIds.length) {
+            const newAttachments = await getTaskAttachmentsByTaskIds(newTaskIds);
+            newAttachments.forEach((attachment) => {
+              const list = state.attachmentsByTaskId.get(attachment.task_id) ?? [];
+              list.push(attachment);
+              state.attachmentsByTaskId.set(attachment.task_id, list);
+            });
+          }
+        } finally {
+          meta.loading = false;
+          if (rerender) {
+            renderBoard();
+          }
+        }
+      };
+
+      const initializeStageTaskState = () => {
+        state.stageTaskState = new Map(
+          state.stages.map((stage) => [
+            stage.id,
+            {
+              items: [],
+              offset: 0,
+              total: 0,
+              hasMore: true,
+              loading: false
+            }
+          ])
+        );
+      };
+
+      const preloadInitialStageTasks = async () => {
+        await Promise.all(state.stages.map((stage) => loadMoreStageTasks(stage.id, { rerender: false })));
+        renderBoard();
       };
 
       const reloadTasks = async () => {
@@ -155,20 +256,21 @@ export async function render(params) {
 
         state.isReloadingTasks = true;
         try {
-          const tasksByStage = await Promise.all(state.stages.map((stage) => getTasks(stage.id)));
-          state.tasksByStage = new Map(state.stages.map((stage, index) => [stage.id, tasksByStage[index] ?? []]));
+          const previousOffsets = new Map(
+            state.stages.map((stage) => [stage.id, Math.max(TASKS_PAGE_SIZE, getStageMeta(stage.id)?.offset ?? TASKS_PAGE_SIZE)])
+          );
 
-          const allTaskIds = Array.from(state.tasksByStage.values())
-            .flat()
-            .map((task) => task.id);
-          const attachments = await getTaskAttachmentsByTaskIds(allTaskIds);
+          initializeStageTaskState();
           state.attachmentsByTaskId = new Map();
-          attachments.forEach((attachment) => {
-            const list = state.attachmentsByTaskId.get(attachment.task_id) ?? [];
-            list.push(attachment);
-            state.attachmentsByTaskId.set(attachment.task_id, list);
-          });
 
+          for (const stage of state.stages) {
+            const target = previousOffsets.get(stage.id) ?? TASKS_PAGE_SIZE;
+            while ((getStageMeta(stage.id)?.offset ?? 0) < target && getStageMeta(stage.id)?.hasMore) {
+              await loadMoreStageTasks(stage.id, { rerender: false });
+            }
+          }
+
+          await rebuildAttachments();
           renderBoard();
         } finally {
           state.isReloadingTasks = false;
@@ -187,23 +289,7 @@ export async function render(params) {
           } catch (error) {
             showInlineError(error?.message ?? 'Unable to refresh tasks.');
           }
-        }, 150);
-      };
-
-      const saveStageTasks = async (stageId) => {
-        const tasks = state.tasksByStage.get(stageId) ?? [];
-        for (let index = 0; index < tasks.length; index += 1) {
-          const task = tasks[index];
-          await updateTask(task.id, {
-            title: task.title,
-            description: task.description,
-            done: task.done,
-            position: index,
-            stageId
-          });
-          task.position = index;
-          task.stage_id = stageId;
-        }
+        }, 200);
       };
 
       const getDropIndex = (stageListElement, pointerY) => {
@@ -223,34 +309,70 @@ export async function render(params) {
         return cards.length;
       };
 
-      const moveTaskInState = (sourceStageId, destinationStageId, taskId, destinationIndex) => {
-        const sourceTasks = [...(state.tasksByStage.get(sourceStageId) ?? [])];
-        const taskIndex = sourceTasks.findIndex((task) => task.id === taskId);
-        if (taskIndex === -1) {
+      const moveTaskInLoadedState = (sourceStageId, destinationStageId, taskId, destinationIndex) => {
+        const sourceMeta = getStageMeta(sourceStageId);
+        const destinationMeta = getStageMeta(destinationStageId);
+        if (!sourceMeta || !destinationMeta) {
           return false;
         }
 
-        const [movedTask] = sourceTasks.splice(taskIndex, 1);
-        const destinationTasks = sourceStageId === destinationStageId
-          ? sourceTasks
-          : [...(state.tasksByStage.get(destinationStageId) ?? [])];
+        const sourceTasks = [...sourceMeta.items];
+        const sourceTaskIndex = sourceTasks.findIndex((task) => task.id === taskId);
+        if (sourceTaskIndex === -1) {
+          return false;
+        }
+
+        const [movedTask] = sourceTasks.splice(sourceTaskIndex, 1);
+        const destinationTasks = sourceStageId === destinationStageId ? sourceTasks : [...destinationMeta.items];
 
         const boundedIndex = Math.max(0, Math.min(destinationIndex, destinationTasks.length));
         destinationTasks.splice(boundedIndex, 0, movedTask);
 
-        state.tasksByStage.set(sourceStageId, sourceTasks);
-        state.tasksByStage.set(destinationStageId, destinationTasks);
+        sourceMeta.items = sourceTasks;
+        destinationMeta.items = destinationTasks;
         return true;
       };
 
-      const persistMove = async (sourceStageId, destinationStageId) => {
-        if (sourceStageId === destinationStageId) {
-          await saveStageTasks(sourceStageId);
+      const saveStageTasks = async (stageId, tasks) => {
+        for (let index = 0; index < tasks.length; index += 1) {
+          const task = tasks[index];
+          await updateTask(task.id, {
+            title: task.title,
+            description: task.description,
+            done: task.done,
+            position: index,
+            stageId
+          });
+        }
+      };
+
+      const persistMove = async (taskId, sourceStageId, destinationStageId, destinationIndex) => {
+        const sourceFull = await getTasks(sourceStageId);
+        const sourceTaskIndex = sourceFull.findIndex((task) => task.id === taskId);
+        if (sourceTaskIndex === -1) {
           return;
         }
 
-        await saveStageTasks(sourceStageId);
-        await saveStageTasks(destinationStageId);
+        const [movedTask] = sourceFull.splice(sourceTaskIndex, 1);
+
+        if (sourceStageId === destinationStageId) {
+          const bounded = Math.max(0, Math.min(destinationIndex, sourceFull.length));
+          sourceFull.splice(bounded, 0, movedTask);
+          await saveStageTasks(sourceStageId, sourceFull);
+          return;
+        }
+
+        const destinationFull = await getTasks(destinationStageId);
+        const existingIndex = destinationFull.findIndex((task) => task.id === taskId);
+        if (existingIndex !== -1) {
+          destinationFull.splice(existingIndex, 1);
+        }
+
+        const bounded = Math.max(0, Math.min(destinationIndex, destinationFull.length));
+        destinationFull.splice(bounded, 0, { ...movedTask, stage_id: destinationStageId });
+
+        await saveStageTasks(sourceStageId, sourceFull);
+        await saveStageTasks(destinationStageId, destinationFull);
       };
 
       const openAddModal = (stageId) => {
@@ -281,10 +403,9 @@ export async function render(params) {
       };
 
       const openEditModal = (taskId, stageId) => {
-        const tasks = state.tasksByStage.get(stageId) ?? [];
-        const task = tasks.find((entry) => entry.id === taskId);
+        const task = (getStageMeta(stageId)?.items ?? []).find((entry) => entry.id === taskId);
         if (!task) {
-          showInlineError('Task not found.');
+          showInlineError('Task not found in loaded items. Scroll to load more tasks.');
           return;
         }
 
@@ -339,7 +460,8 @@ export async function render(params) {
           return;
         }
 
-        await reloadTasks();
+        initializeStageTaskState();
+        await preloadInitialStageTasks();
 
         if (activeTasksChannel && activeProjectId !== params.id) {
           cleanupActiveTasksChannel();
@@ -349,18 +471,13 @@ export async function render(params) {
           const stageIds = new Set(state.stages.map((stage) => stage.id));
           activeTasksChannel = supabase
             .channel(`project-tasks-live:${params.id}`)
-            .on(
-              'postgres_changes',
-              { event: '*', schema: 'public', table: 'tasks' },
-              (payload) => {
-                const newStageId = payload.new?.stage_id;
-                const oldStageId = payload.old?.stage_id;
-
-                if (stageIds.has(newStageId) || stageIds.has(oldStageId)) {
-                  scheduleRealtimeReload();
-                }
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
+              const newStageId = payload.new?.stage_id;
+              const oldStageId = payload.old?.stage_id;
+              if (stageIds.has(newStageId) || stageIds.has(oldStageId)) {
+                scheduleRealtimeReload();
               }
-            )
+            })
             .subscribe();
           activeProjectId = params.id;
         }
@@ -407,6 +524,32 @@ export async function render(params) {
           deleteModal.show();
         }
       });
+
+      board?.addEventListener(
+        'scroll',
+        async (event) => {
+          const stageList = event.target.closest('[data-stage-list]');
+          if (!stageList) {
+            return;
+          }
+
+          if (stageList.scrollTop + stageList.clientHeight < stageList.scrollHeight - 80) {
+            return;
+          }
+
+          const stageId = stageList.getAttribute('data-stage-list');
+          if (!stageId) {
+            return;
+          }
+
+          try {
+            await loadMoreStageTasks(stageId);
+          } catch (error) {
+            showInlineError(error?.message ?? 'Unable to load more tasks.');
+          }
+        },
+        true
+      );
 
       board?.addEventListener('dragstart', (event) => {
         const taskCard = event.target.closest('[data-task-card]');
@@ -465,7 +608,7 @@ export async function render(params) {
         }
 
         const destinationIndex = getDropIndex(stageList, event.clientY);
-        const moved = moveTaskInState(sourceStageId, destinationStageId, taskId, destinationIndex);
+        const moved = moveTaskInLoadedState(sourceStageId, destinationStageId, taskId, destinationIndex);
         if (!moved) {
           return;
         }
@@ -473,7 +616,8 @@ export async function render(params) {
         renderBoard();
 
         try {
-          await persistMove(sourceStageId, destinationStageId);
+          await persistMove(taskId, sourceStageId, destinationStageId, destinationIndex);
+          await reloadTasks();
         } catch (error) {
           showInlineError(error?.message ?? 'Unable to move task.');
           await reloadTasks();
@@ -501,16 +645,17 @@ export async function render(params) {
           let targetTaskId = '';
 
           if (mode === 'edit' && taskId) {
-            const existingTask = (state.tasksByStage.get(stageId) ?? []).find((task) => task.id === taskId);
+            const existingTask = (getStageMeta(stageId)?.items ?? []).find((task) => task.id === taskId);
             await updateTask(taskId, {
               title: taskTitle,
               description: taskDescription,
               done,
-              position: existingTask?.position ?? 0
+              position: existingTask?.position ?? 0,
+              stageId
             });
             targetTaskId = taskId;
           } else {
-            const nextPosition = (state.tasksByStage.get(stageId) ?? []).length;
+            const nextPosition = getStageMeta(stageId)?.total ?? 0;
             const createdTask = await createTask(stageId, {
               title: taskTitle,
               description: taskDescription,

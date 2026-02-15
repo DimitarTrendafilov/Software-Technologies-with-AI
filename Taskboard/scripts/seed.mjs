@@ -63,6 +63,69 @@ const taskTemplates = [
   { title: 'Security audit', description: 'Identify and fix security vulnerabilities' }
 ];
 
+function parseArgs(argv) {
+  const args = {
+    projectsPerUser: 4,
+    tasksPerProject: 12,
+    users: sampleUsers.map((user) => user.email)
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const entry = argv[index];
+    if (entry === '--projects' || entry === '-p') {
+      const value = Number.parseInt(argv[index + 1], 10);
+      if (Number.isInteger(value) && value > 0) {
+        args.projectsPerUser = value;
+      }
+      index += 1;
+    } else if (entry === '--tasks' || entry === '-t') {
+      const value = Number.parseInt(argv[index + 1], 10);
+      if (Number.isInteger(value) && value > 0) {
+        args.tasksPerProject = value;
+      }
+      index += 1;
+    } else if (entry === '--users' || entry === '-u') {
+      const value = String(argv[index + 1] ?? '')
+        .split(',')
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean);
+      if (value.length) {
+        args.users = value;
+      }
+      index += 1;
+    }
+  }
+
+  return args;
+}
+
+function buildProjectTemplates(projectsPerUser) {
+  if (projectsPerUser <= projectTemplates.length) {
+    return projectTemplates.slice(0, projectsPerUser);
+  }
+
+  return Array.from({ length: projectsPerUser }, (_, index) => ({
+    title: `Scale Test Project ${String(index + 1).padStart(3, '0')}`,
+    description: `Large dataset project ${index + 1} for pagination and performance verification`
+  }));
+}
+
+function buildTasksForProject(tasksPerProject, stages) {
+  return Array.from({ length: tasksPerProject }, (_, index) => {
+    const template = taskTemplates[index % taskTemplates.length];
+    const stageIndex = index % stages.length;
+    const stage = stages[stageIndex];
+
+    return {
+      stage_id: stage.id,
+      title: tasksPerProject <= taskTemplates.length ? template.title : `${template.title} #${index + 1}`,
+      description: template.description,
+      position: Math.floor(index / stages.length),
+      done: stageIndex === 2 && Math.random() > 0.3
+    };
+  });
+}
+
 async function registerUser(email, password) {
   try {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
@@ -89,9 +152,11 @@ async function registerUser(email, password) {
   }
 }
 
-async function createProjectsAndTasks(userId) {
+async function createProjectsAndTasks(userId, { projectsPerUser, tasksPerProject }) {
   try {
-    for (const projectTemplate of projectTemplates) {
+    const generatedProjects = buildProjectTemplates(projectsPerUser);
+
+    for (const projectTemplate of generatedProjects) {
       const { data: project, error: projectError } = await supabase
         .from('projects')
         .insert({
@@ -129,30 +194,13 @@ async function createProjectsAndTasks(userId) {
 
       console.log(`      ✓ Created ${stages.length} stages`);
 
-      let taskCount = 0;
-      for (let i = 0; i < taskTemplates.length; i++) {
-        const stageIndex = i % stages.length;
-        const stage = stages[stageIndex];
-        const task = taskTemplates[i];
-
-        const { error: taskError } = await supabase
-          .from('tasks')
-          .insert({
-            stage_id: stage.id,
-            title: task.title,
-            description: task.description,
-            position: Math.floor(i / stages.length),
-            done: stageIndex === 2 && Math.random() > 0.3
-          });
-
-        if (taskError) {
-          throw taskError;
-        }
-
-        taskCount++;
+      const tasks = buildTasksForProject(tasksPerProject, stages);
+      const { error: tasksError } = await supabase.from('tasks').insert(tasks);
+      if (tasksError) {
+        throw tasksError;
       }
 
-      console.log(`      ✓ Created ${taskCount} tasks`);
+      console.log(`      ✓ Created ${tasks.length} tasks`);
     }
   } catch (error) {
     console.error(`  ✗ Failed to create projects:`, error.message);
@@ -162,12 +210,24 @@ async function createProjectsAndTasks(userId) {
 
 async function main() {
   console.log('\n🌱 Seeding Taskboard database...\n');
+  const options = parseArgs(process.argv.slice(2));
+  const selectedUsers = sampleUsers.filter((user) => options.users.includes(user.email.toLowerCase()));
+
+  if (!selectedUsers.length) {
+    console.error('❌ No valid users selected. Use --users with one or more sample emails.');
+    process.exit(1);
+  }
 
   try {
     console.log('1️⃣  Registering sample users...');
+    console.log(
+      `   Settings: ${options.projectsPerUser} projects/user, ${options.tasksPerProject} tasks/project, users=${selectedUsers
+        .map((user) => user.email)
+        .join(', ')}`
+    );
     const userIds = {};
 
-    for (const user of sampleUsers) {
+    for (const user of selectedUsers) {
       try {
         userIds[user.email] = await registerUser(user.email, user.password);
       } catch (error) {
@@ -182,7 +242,7 @@ async function main() {
       const userId = userIds[email];
       console.log(`\n  User: ${email}`);
 
-      await createProjectsAndTasks(userId);
+      await createProjectsAndTasks(userId, options);
     }
 
     console.log('\n✅ Seeding complete!\n');
