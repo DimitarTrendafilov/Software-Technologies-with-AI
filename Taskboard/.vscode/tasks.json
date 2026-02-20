@@ -4,6 +4,19 @@
 		{
 			"label": "Run Taskboard Dev Server",
 			"type": "shell",
+			"options": {
+				"shell": {
+					"executable": "C:\\Windows\\System32\\cmd.exe",
+					"args": [
+						"/d",
+						"/c"
+					]
+				}
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			},
 			"command": "npm",
 			"args": [
 				"run",
@@ -15,6 +28,38 @@
 			"label": "Build and Preview Taskboard",
 			"type": "shell",
 			"command": "npm run build && npm run preview",
+			"isBackground": true
+		},
+		{
+			"label": "Build Taskboard",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			]
+		},
+		{
+			"label": "Run Taskboard Dev Server (cmd)",
+			"type": "shell",
+			"options": {
+				"shell": {
+					"executable": "C:\\Windows\\System32\\cmd.exe",
+					"args": [
+						"/d",
+						"/c"
+					]
+				}
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			},
+			"command": "cmd",
+			"args": [
+				"/c",
+				"npm run dev"
+			],
 			"isBackground": true
 		}
 	]
