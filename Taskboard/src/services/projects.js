@@ -82,6 +82,30 @@ export async function createProject({ title, description, userId }) {
     throw error;
   }
 
+  const { data: existingStages, error: stagesReadError } = await supabase
+    .from('project_stages')
+    .select('id')
+    .eq('project_id', data.id)
+    .limit(1);
+
+  if (stagesReadError) {
+    throw stagesReadError;
+  }
+
+  if (!existingStages?.length) {
+    const { error: stagesInsertError } = await supabase
+      .from('project_stages')
+      .insert([
+        { project_id: data.id, name: 'To Do', position: 0 },
+        { project_id: data.id, name: 'In Progress', position: 1 },
+        { project_id: data.id, name: 'Done', position: 2 }
+      ]);
+
+    if (stagesInsertError) {
+      throw stagesInsertError;
+    }
+  }
+
   return data;
 }
 
