@@ -61,6 +61,25 @@
 				"npm run dev"
 			],
 			"isBackground": true
+		},
+		{
+			"label": "Supabase DB Push",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"db:push"
+			]
+		},
+		{
+			"label": "Supabase Full Sync (cmd)",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				"npm run db:sync"
+			]
 		}
 	]
 }

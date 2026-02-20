@@ -12,6 +12,7 @@
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
     "db:pull": "supabase db pull",
+    "db:sync": "supabase db push && supabase start && supabase db reset && node scripts/seed.mjs",
     "seed": "node scripts/seed.mjs"
   },
   "dependencies": {
