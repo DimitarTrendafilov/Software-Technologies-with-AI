@@ -80,6 +80,15 @@
 				"/c",
 				"npm run db:sync"
 			]
+		},
+		{
+			"label": "Supabase DB Sync Direct",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"db:sync"
+			]
 		}
 	]
 }
