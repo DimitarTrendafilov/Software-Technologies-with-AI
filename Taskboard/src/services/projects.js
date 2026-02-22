@@ -125,6 +125,27 @@ export async function updateProject(projectId, { title, description }) {
 }
 
 export async function deleteProject(projectId) {
+  const { data: stages, error: stagesError } = await supabase
+    .from('project_stages')
+    .select('id')
+    .eq('project_id', projectId);
+
+  if (stagesError) {
+    throw stagesError;
+  }
+
+  const stageIds = (stages ?? []).map((stage) => stage.id);
+  if (stageIds.length > 0) {
+    const { error: tasksDeleteError } = await supabase
+      .from('tasks')
+      .delete()
+      .in('stage_id', stageIds);
+
+    if (tasksDeleteError) {
+      throw tasksDeleteError;
+    }
+  }
+
   const { error } = await supabase
     .from('projects')
     .delete()
