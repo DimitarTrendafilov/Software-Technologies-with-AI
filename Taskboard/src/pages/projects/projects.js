@@ -88,6 +88,7 @@ export async function render() {
                 done_tasks: 0
               };
               const isOwner = project.owner_id === state.currentUserId;
+              const canManageProject = isOwner || !project.owner_id;
 
               return `
                 <tr>
@@ -99,9 +100,9 @@ export async function render() {
                   <td>${counts.stages_count}</td>
                   <td class="text-end projects-actions">
                     <a class="btn btn-sm btn-outline-secondary" href="/project/${project.id}/tasks" data-link>View Tasks</a>
-                    ${isOwner ? `<a class="btn btn-sm btn-outline-dark" href="/projects/${project.id}/users" data-link>Users</a>` : ''}
-                    ${isOwner ? `<a class="btn btn-sm btn-outline-primary" href="/project/${project.id}/edit" data-link>Edit</a>` : ''}
-                    ${isOwner ? `<button class="btn btn-sm btn-outline-danger" type="button" data-delete-project="${project.id}" data-project-title="${project.title}">Delete</button>` : ''}
+                    ${canManageProject ? `<a class="btn btn-sm btn-outline-dark" href="/projects/${project.id}/users" data-link>Users</a>` : ''}
+                    ${canManageProject ? `<a class="btn btn-sm btn-outline-primary" href="/project/${project.id}/edit" data-link>Edit</a>` : ''}
+                    ${canManageProject ? `<button class="btn btn-sm btn-outline-danger" type="button" data-delete-project="${project.id}" data-project-title="${project.title}">Delete</button>` : ''}
                   </td>
                 </tr>
               `;
