@@ -2,6 +2,7 @@ import './projects.css';
 import { loadHtml } from '../../utils/loaders.js';
 import { getCurrentUser } from '../../services/auth.js';
 import { deleteProject, getProjectsPaged, getProjectSummaries } from '../../services/projects.js';
+import { isAdminUser } from '../../services/admin.js';
 import { setHidden, setText } from '../../utils/dom.js';
 import { showError as showErrorToast, showSuccess } from '../../services/toast.js';
 
@@ -26,7 +27,8 @@ export async function render() {
         pageSize: 10,
         totalCount: 0,
         totalPages: 1,
-        currentUserId: ''
+        currentUserId: '',
+        isAdmin: false
       };
 
       const showError = (message) => {
@@ -61,6 +63,7 @@ export async function render() {
           return;
         }
         state.currentUserId = user.id;
+        state.isAdmin = isAdminUser(user);
 
         try {
           const pageResult = await getProjectsPaged({ page, pageSize: state.pageSize });
@@ -88,7 +91,7 @@ export async function render() {
                 done_tasks: 0
               };
               const isOwner = project.owner_id === state.currentUserId;
-              const canManageProject = isOwner || !project.owner_id;
+              const canManageProject = state.isAdmin || isOwner || !project.owner_id;
 
               return `
                 <tr>
