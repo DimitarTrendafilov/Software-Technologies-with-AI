@@ -1,0 +1,11 @@
+erDiagram
+  projects ||--o{ project_stages : has
+  project_stages ||--o{ tasks : contains
+  projects ||--o{ project_members : has
+  projects ||--o{ labels : has
+  tasks ||--o{ task_labels : tagged_with
+  labels ||--o{ task_labels : used_in
+  tasks ||--o{ task_comments : has
+  tasks ||--o{ task_checklist_items : has
+  tasks ||--o{ task_attachments : has
+  tasks ||--o{ task_activity : logs

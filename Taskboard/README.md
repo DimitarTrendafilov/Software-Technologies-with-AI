@@ -103,6 +103,13 @@ Taskboard currently contains two schema tracks in the repository:
 
 ### Schema A: Project-Centric (Tasks Workflow)
 
+Static diagram files:
+
+- `docs/schema-project-centric.svg`
+- `docs/schema-project-centric.png`
+
+![Project-Centric Schema](docs/schema-project-centric.svg)
+
 ```mermaid
 erDiagram
   projects ||--o{ project_stages : has
@@ -130,6 +137,13 @@ Core relationships:
 - `task_activity.task_id -> tasks.id`
 
 ### Schema B: Board-Centric (Legacy/Alternative Model)
+
+Static diagram files:
+
+- `docs/schema-board-centric.svg`
+- `docs/schema-board-centric.png`
+
+![Board-Centric Schema](docs/schema-board-centric.svg)
 
 ```mermaid
 erDiagram

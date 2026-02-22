@@ -1,0 +1,9 @@
+erDiagram
+  boards ||--o{ memberships : has
+  boards ||--o{ lists : has
+  lists ||--o{ cards : contains
+  boards ||--o{ labels : has
+  cards ||--o{ card_labels : tagged_with
+  labels ||--o{ card_labels : used_in
+  cards ||--o{ comments : has
+  boards ||--o{ activity_events : logs

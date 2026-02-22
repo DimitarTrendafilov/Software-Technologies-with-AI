@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620">
+  <style>
+    .title { font: 700 26px Arial, sans-serif; fill: #1f2937; }
+    .node { fill: #ecfeff; stroke: #0891b2; stroke-width: 2; rx: 10; }
+    .txt { font: 600 14px Arial, sans-serif; fill: #111827; }
+    .line { stroke: #4b5563; stroke-width: 2; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0,0 10,4 0,8" fill="#4b5563" />
+    </marker>
+  </defs>
+
+  <text class="title" x="24" y="44">Taskboard Schema B: Board-Centric</text>
+
+  <rect class="node" x="40" y="100" width="160" height="52" /><text class="txt" x="94" y="132">boards</text>
+  <rect class="node" x="290" y="100" width="170" height="52" /><text class="txt" x="338" y="132">memberships</text>
+  <rect class="node" x="290" y="210" width="120" height="52" /><text class="txt" x="328" y="242">lists</text>
+  <rect class="node" x="500" y="210" width="120" height="52" /><text class="txt" x="542" y="242">cards</text>
+
+  <rect class="node" x="290" y="320" width="120" height="52" /><text class="txt" x="330" y="352">labels</text>
+  <rect class="node" x="500" y="320" width="160" height="52" /><text class="txt" x="540" y="352">card_labels</text>
+  <rect class="node" x="740" y="210" width="150" height="52" /><text class="txt" x="785" y="242">comments</text>
+  <rect class="node" x="740" y="100" width="180" height="52" /><text class="txt" x="778" y="132">activity_events</text>
+
+  <line class="line" x1="200" y1="126" x2="290" y2="126" />
+  <line class="line" x1="200" y1="126" x2="290" y2="236" />
+  <line class="line" x1="200" y1="126" x2="290" y2="346" />
+  <line class="line" x1="200" y1="126" x2="740" y2="126" />
+
+  <line class="line" x1="410" y1="236" x2="500" y2="236" />
+  <line class="line" x1="620" y1="236" x2="740" y2="236" />
+  <line class="line" x1="410" y1="346" x2="500" y2="346" />
+  <line class="line" x1="560" y1="262" x2="560" y2="320" />
+</svg>
