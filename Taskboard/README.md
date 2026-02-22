@@ -94,6 +94,71 @@ scripts/
   npm run seed
   ```
 
+## Database Schemas
+
+Taskboard currently contains two schema tracks in the repository:
+
+- **Project-centric schema (active in app services):** `projects`, `project_stages`, `tasks`, `project_members`, `labels`, `task_labels`, `task_comments`, `task_checklist_items`, `task_attachments`, `task_activity`.
+- **Board-centric schema (available in `supabase/schema.sql`):** `boards`, `memberships`, `lists`, `cards`, `labels`, `card_labels`, `comments`, `activity_events`.
+
+### Schema A: Project-Centric (Tasks Workflow)
+
+```mermaid
+erDiagram
+  projects ||--o{ project_stages : has
+  project_stages ||--o{ tasks : contains
+  projects ||--o{ project_members : has
+  projects ||--o{ labels : has
+  tasks ||--o{ task_labels : tagged_with
+  labels ||--o{ task_labels : used_in
+  tasks ||--o{ task_comments : has
+  tasks ||--o{ task_checklist_items : has
+  tasks ||--o{ task_attachments : has
+  tasks ||--o{ task_activity : logs
+```
+
+Core relationships:
+
+- `project_stages.project_id -> projects.id`
+- `tasks.stage_id -> project_stages.id`
+- `project_members.project_id -> projects.id`
+- `labels.project_id -> projects.id`
+- `task_labels.task_id -> tasks.id`, `task_labels.label_id -> labels.id`
+- `task_comments.task_id -> tasks.id`
+- `task_checklist_items.task_id -> tasks.id`
+- `task_attachments.task_id -> tasks.id`
+- `task_activity.task_id -> tasks.id`
+
+### Schema B: Board-Centric (Legacy/Alternative Model)
+
+```mermaid
+erDiagram
+  boards ||--o{ memberships : has
+  boards ||--o{ lists : has
+  lists ||--o{ cards : contains
+  boards ||--o{ labels : has
+  cards ||--o{ card_labels : tagged_with
+  labels ||--o{ card_labels : used_in
+  cards ||--o{ comments : has
+  boards ||--o{ activity_events : logs
+```
+
+Core relationships:
+
+- `memberships.board_id -> boards.id`
+- `lists.board_id -> boards.id`
+- `cards.list_id -> lists.id`
+- `labels.board_id -> boards.id`
+- `card_labels.card_id -> cards.id`, `card_labels.label_id -> labels.id`
+- `comments.card_id -> cards.id`
+- `activity_events.board_id -> boards.id`
+
+### RLS Coverage
+
+- Both schema tracks rely on Supabase Row-Level Security.
+- Access is scoped to resource ownership/member access (project owner/member or board owner/member).
+- Keep policy updates in migrations to avoid schema drift between environments.
+
 ## Sample Seed Accounts
 
 When seeding with service role access, the script creates:
