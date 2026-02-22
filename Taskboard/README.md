@@ -203,3 +203,28 @@ When seeding with service role access, the script creates:
   ```bash
   npm run dev -- --port 5174
   ```
+
+  ## Deploy to Netlify
+
+  This repository includes `netlify.toml` configured for Vite SPA deploys:
+
+  - Build command: `npm run build`
+  - Publish directory: `dist`
+  - SPA fallback redirect: `/* -> /index.html (200)`
+
+  ### Netlify UI (recommended)
+
+  1. In Netlify, click **Add new site** → **Import an existing project**.
+  2. Connect GitHub and select this repository.
+  3. Keep defaults from `netlify.toml`.
+  4. Add environment variables:
+    - `VITE_SUPABASE_URL`
+    - `VITE_SUPABASE_ANON_KEY`
+  5. Deploy.
+
+  ### Netlify CLI (optional)
+
+  ```bash
+  npx netlify login
+  npx netlify deploy --create-site <site-name> --dir dist --prod
+  ```
