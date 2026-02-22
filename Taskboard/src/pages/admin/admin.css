@@ -7,3 +7,7 @@
   display: grid;
   gap: 0.85rem;
 }
+
+.admin-tabs .nav-link {
+  font-weight: 600;
+}
