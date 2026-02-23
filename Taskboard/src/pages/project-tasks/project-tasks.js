@@ -75,6 +75,7 @@ export async function render(params) {
       const taskAssigneeInput = document.querySelector('[data-task-assignee]');
       const taskDoneInput = document.querySelector('#task-done');
       const taskFilesInput = document.querySelector('[data-task-files]');
+      const taskModalAttachments = document.querySelector('[data-task-modal-attachments]');
       const deleteTaskTitle = document.querySelector('[data-delete-task-title]');
       const confirmDeleteTaskBtn = document.querySelector('[data-confirm-delete-task]');
       const taskDiscussion = document.querySelector('[data-task-discussion]');
@@ -226,6 +227,44 @@ export async function render(params) {
                     : ''
                 }
               </article>
+            `;
+          })
+          .join('');
+      };
+
+      const renderModalAttachments = (taskId) => {
+        if (!taskModalAttachments) {
+          return;
+        }
+
+        const attachments = state.attachmentsByTaskId.get(taskId) ?? [];
+        
+        if (!attachments.length) {
+          taskModalAttachments.innerHTML = '<p class="text-muted small mb-0">No attachments yet.</p>';
+          return;
+        }
+
+        const isImage = (mimeType) => mimeType && mimeType.startsWith('image/');
+        
+        taskModalAttachments.innerHTML = attachments
+          .map((attachment) => {
+            if (!attachment.url) {
+              return `<div class="task-modal-attachment"><span class="text-muted small">${escapeHtml(attachment.file_name)}</span></div>`;
+            }
+
+            if (isImage(attachment.mime_type)) {
+              return `
+                <div class="task-modal-attachment">
+                  <img src="${escapeHtml(attachment.url)}" alt="${escapeHtml(attachment.file_name)}" class="task-modal-attachment__image" loading="lazy" />
+                  <a href="${escapeHtml(attachment.url)}" target="_blank" rel="noopener noreferrer" class="task-modal-attachment__link">📎 ${escapeHtml(attachment.file_name)}</a>
+                </div>
+              `;
+            }
+
+            return `
+              <div class="task-modal-attachment">
+                <a href="${escapeHtml(attachment.url)}" target="_blank" rel="noopener noreferrer" class="task-modal-attachment__link">📎 ${escapeHtml(attachment.file_name)}</a>
+              </div>
             `;
           })
           .join('');
@@ -471,8 +510,24 @@ export async function render(params) {
               .join('')}</div>`
           : '';
         
-        const attachmentHtml = attachments.length
-          ? `<div class="task-card__attachments">${attachments
+        const isImage = (mimeType) => mimeType && mimeType.startsWith('image/');
+        const images = attachments.filter((att) => isImage(att.mime_type));
+        const otherFiles = attachments.filter((att) => !isImage(att.mime_type));
+        
+        const imagesHtml = images.length
+          ? `<div class="task-card__images">${images
+              .map((attachment) => {
+                if (!attachment.url) {
+                  return '';
+                }
+                return `<img src="${escapeHtml(attachment.url)}" alt="${escapeHtml(attachment.file_name)}" class="task-card__image" loading="lazy" />`;
+              })
+              .filter(Boolean)
+              .join('')}</div>`
+          : '';
+        
+        const attachmentHtml = otherFiles.length
+          ? `<div class="task-card__attachments">${otherFiles
               .map((attachment) => {
                 if (!attachment.url) {
                   return `<span class="text-muted small">${escapeHtml(attachment.file_name)}</span>`;
@@ -501,6 +556,7 @@ export async function render(params) {
               ${dueDateHtml}
             </div>
             ${labelsHtml}
+            ${imagesHtml}
             ${attachmentHtml}
           </article>
         `;
@@ -813,6 +869,7 @@ export async function render(params) {
           taskCommentsList.innerHTML = '<p class="text-muted small mb-0">Save the task first to start discussing.</p>';
         }
         setHidden(taskDiscussion, true);
+        renderModalAttachments(null);
         taskModal.show();
       };
 
@@ -861,6 +918,7 @@ export async function render(params) {
           taskCommentInput.value = '';
         }
         setHidden(taskDiscussion, false);
+        renderModalAttachments(task.id);
         taskModal.show();
         await loadTaskDiscussion(task.id);
         await loadTaskChecklist(task.id);
