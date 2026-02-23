@@ -66,3 +66,25 @@
     opacity: 0;
   }
 }
+
+/* Responsive Toast Notifications */
+
+@media (max-width: 576px) {
+  .toast-container {
+    max-width: 95vw;
+    padding: 0 0.5rem;
+  }
+
+  .toast {
+    border-radius: 6px;
+  }
+
+  .toast-body {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.875rem;
+  }
+
+  .toast-icon {
+    font-size: 1.1rem;
+  }
+}

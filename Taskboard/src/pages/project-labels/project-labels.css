@@ -83,4 +83,66 @@
   .labels-layout {
     grid-template-columns: 1fr;
   }
+
+  .labels-panel {
+    order: 2;
+  }
+
+  .labels-tasks-panel {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .labels-panel,
+  .labels-tasks-panel {
+    padding: 0.875rem;
+  }
+
+  .label-item {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .label-task-card {
+    padding: 0.6rem 0.7rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .labels-layout {
+    gap: 1rem;
+  }
+
+  .labels-panel,
+  .labels-tasks-panel {
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+  }
+
+  .label-item {
+    padding: 0.4rem 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .label-item__info {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .label-name {
+    font-size: 0.9rem;
+  }
+
+  .label-task-card {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .label-task-card__title {
+    font-size: 0.9rem;
+  }
+
+  .label-task-card__meta,
+  .label-task-card__desc {
+    font-size: 0.8rem;
+  }
 }

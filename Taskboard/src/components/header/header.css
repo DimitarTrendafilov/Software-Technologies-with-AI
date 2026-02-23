@@ -40,3 +40,67 @@
   background: var(--accent-deep);
   color: #fff;
 }
+
+/* Responsive Header */
+
+@media (max-width: 992px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  .btn-accent {
+    padding: 0.3rem 0.9rem;
+    font-size: 0.875rem;
+  }
+
+  .nav-link {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .site-header {
+    padding: 0.5rem 0;
+  }
+
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+
+  .navbar-toggler {
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+  }
+
+  .btn-accent {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  /* Stack navigation items vertically on mobile */
+  .navbar-collapse {
+    margin-top: 0.5rem;
+  }
+
+  .navbar-nav {
+    gap: 0.25rem;
+  }
+
+  .nav-item {
+    width: 100%;
+  }
+
+  .nav-link {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+  }
+
+  .dropdown-menu {
+    position: static !important;
+    transform: none !important;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.5);
+  }
+}

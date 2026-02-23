@@ -66,3 +66,86 @@
   font-weight: 600;
   font-size: 0.95rem;
 }
+
+/* Responsive Dashboard */
+
+@media (max-width: 992px) {
+  .board-card {
+    min-height: 180px;
+    padding: 1.25rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .board-card {
+    min-height: 160px;
+    padding: 1rem;
+  }
+
+  .board-form {
+    padding: 1.25rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
+  }
+
+  .stat-content {
+    text-align: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .board-card {
+    min-height: 140px;
+    padding: 0.875rem;
+  }
+
+  .board-card__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .board-form {
+    padding: 1rem;
+  }
+
+  .stat-card {
+    padding: 0.875rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+  }
+
+  .empty-state {
+    margin-top: 1.5rem;
+  }
+}

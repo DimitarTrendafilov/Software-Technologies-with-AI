@@ -2,3 +2,29 @@
   padding: 2rem;
   text-align: center;
 }
+
+/* Responsive Not Found Page */
+
+@media (max-width: 768px) {
+  .not-found-card {
+    padding: 1.75rem;
+  }
+
+  .not-found-card h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .not-found-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .not-found-card h1 {
+    font-size: 1.75rem;
+  }
+
+  .not-found-card p {
+    font-size: 0.9rem;
+  }
+}

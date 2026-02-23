@@ -11,3 +11,57 @@
 .admin-tabs .nav-link {
   font-weight: 600;
 }
+
+/* Responsive Admin Page */
+
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .table td,
+  .table th {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .admin-edit-fields {
+    gap: 0.75rem;
+  }
+
+  .admin-tabs .nav-link {
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Make table scrollable on mobile */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    font-size: 0.8rem;
+    min-width: 500px;
+  }
+
+  .table td,
+  .table th {
+    padding: 0.5rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  .admin-edit-fields {
+    gap: 0.65rem;
+  }
+
+  .admin-tabs {
+    overflow-x: auto;
+  }
+
+  .admin-tabs .nav-link {
+    font-size: 0.85rem;
+    padding: 0.55rem 0.85rem;
+  }
+}

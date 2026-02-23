@@ -2,3 +2,35 @@
 textarea.form-control {
   border-radius: 0.8rem;
 }
+
+/* Responsive Project Form */
+
+@media (max-width: 768px) {
+  .form-control,
+  textarea.form-control {
+    font-size: 0.95rem;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .form-control,
+  textarea.form-control {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.7rem;
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}

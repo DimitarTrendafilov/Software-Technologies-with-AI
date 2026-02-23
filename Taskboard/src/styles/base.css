@@ -52,3 +52,67 @@ a {
   padding: 0.3rem 0.75rem;
   border-radius: 999px;
 }
+
+/* Responsive Design */
+
+/* Mobile First - Base styles above are for mobile */
+
+/* Tablets and small desktops */
+@media (max-width: 992px) {
+  .page-content {
+    padding: 1.5rem 0 2rem;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 576px) {
+  body {
+    font-size: 14px;
+  }
+
+  .page-content {
+    padding: 1rem 0 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .glass-card {
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Hide or adjust spacing for mobile */
+  .d-flex.gap-3 {
+    gap: 0.75rem !important;
+  }
+
+  .d-flex.gap-2 {
+    gap: 0.5rem !important;
+  }
+}

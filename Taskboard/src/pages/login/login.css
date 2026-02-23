@@ -14,3 +14,47 @@
   background: var(--ink);
   color: #fff;
 }
+
+/* Responsive Login Page */
+
+@media (max-width: 768px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+
+  .login-card .form-control {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-card {
+    padding: 1.25rem;
+    margin: 1rem 0;
+  }
+
+  .login-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .login-card .form-control {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.9rem;
+  }
+
+  .login-card .btn {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .login-card .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .login-card .btn-group .btn {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+  }
+}
