@@ -4,7 +4,7 @@
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync, statSync } from 'fs';
 import { createClient } from '@supabase/supabase-js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,6 +32,31 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
 const supabase = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
+
+const TASK_ATTACHMENTS_BUCKET = 'task-attachments';
+const IMAGES_DIR = resolve(__dirname, '..', 'images');
+
+// Map task titles to image files
+const taskImageMap = {
+  'requirements': 'requirements.jpg',
+  'design': 'design.jpg',
+  'mockups': 'design.jpg',
+  'development': 'development.jpg',
+  'environment': 'development.jpg',
+  'features': 'features.jpg',
+  'implement': 'features.jpg',
+  'testing': 'testing.jpg',
+  'qa': 'testing.jpg',
+  'documentation': 'documentation.jpg',
+  'deployment': 'deployment.jpg',
+  'launch': 'monitoring.jpg',
+  'monitoring': 'monitoring.jpg',
+  'support': 'monitoring.jpg',
+  'performance': 'performance.jpg',
+  'optimization': 'performance.jpg',
+  'security': 'security.jpg',
+  'audit': 'security.jpg'
+};
 
 const sampleUsers = [
   { email: 'steve@gmail.com', password: '123456' },
@@ -152,9 +177,94 @@ async function registerUser(email, password) {
   }
 }
 
+function getImageForTask(taskTitle) {
+  const titleLower = taskTitle.toLowerCase();
+  
+  for (const [keyword, imageName] of Object.entries(taskImageMap)) {
+    if (titleLower.includes(keyword)) {
+      return imageName;
+    }
+  }
+  
+  // Default fallback
+  return 'features.jpg';
+}
+
+async function ensureBucketExists() {
+  const { data: buckets } = await supabaseAdmin.storage.listBuckets();
+  const bucketExists = buckets?.some((b) => b.name === TASK_ATTACHMENTS_BUCKET);
+
+  if (!bucketExists) {
+    console.log(`  Creating storage bucket: ${TASK_ATTACHMENTS_BUCKET}...`);
+    const { error } = await supabaseAdmin.storage.createBucket(TASK_ATTACHMENTS_BUCKET, {
+      public: false,
+      fileSizeLimit: 10485760 // 10MB
+    });
+
+    if (error) {
+      console.error(`  ✗ Failed to create bucket:`, error.message);
+    } else {
+      console.log(`  ✓ Created bucket: ${TASK_ATTACHMENTS_BUCKET}`);
+    }
+  }
+}
+
+async function uploadImageToTask(taskId, taskTitle, userId) {
+  try {
+    const imageName = getImageForTask(taskTitle);
+    const imagePath = resolve(IMAGES_DIR, imageName);
+    
+    let imageBuffer;
+    try {
+      imageBuffer = readFileSync(imagePath);
+    } catch (err) {
+      console.log(`      ⚠ Image not found: ${imageName}`);
+      return false;
+    }
+
+    const safeName = imageName.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const storagePath = `${taskId}/${crypto.randomUUID()}-${safeName}`;
+
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from(TASK_ATTACHMENTS_BUCKET)
+      .upload(storagePath, imageBuffer, {
+        upsert: false,
+        contentType: 'image/jpeg'
+      });
+
+    if (uploadError) {
+      console.log(`      ⚠ Upload failed: ${uploadError.message}`);
+      return false;
+    }
+
+    const { error: metadataError } = await supabase
+      .from('task_attachments')
+      .insert({
+        task_id: taskId,
+        storage_path: storagePath,
+        file_name: imageName,
+        mime_type: 'image/jpeg',
+        size_bytes: imageBuffer.length,
+        uploaded_by: userId
+      });
+
+    if (metadataError) {
+      await supabaseAdmin.storage.from(TASK_ATTACHMENTS_BUCKET).remove([storagePath]);
+      console.log(`      ⚠ Metadata insert failed: ${metadataError.message}`);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.log(`      ⚠ Error uploading image: ${error.message}`);
+    return false;
+  }
+}
+
 async function createProjectsAndTasks(userId, { projectsPerUser, tasksPerProject }) {
   try {
     const generatedProjects = buildProjectTemplates(projectsPerUser);
+    const allCreatedProjects = [];
 
     for (const projectTemplate of generatedProjects) {
       const { data: project, error: projectError } = await supabase
@@ -195,17 +305,55 @@ async function createProjectsAndTasks(userId, { projectsPerUser, tasksPerProject
       console.log(`      ✓ Created ${stages.length} stages`);
 
       const tasks = buildTasksForProject(tasksPerProject, stages);
-      const { error: tasksError } = await supabase.from('tasks').insert(tasks);
+      const { data: createdTasks, error: tasksError } = await supabase
+        .from('tasks')
+        .insert(tasks)
+        .select('id, title');
+      
       if (tasksError) {
         throw tasksError;
       }
 
       console.log(`      ✓ Created ${tasks.length} tasks`);
+      
+      allCreatedProjects.push({
+        project,
+        tasks: createdTasks
+      });
     }
+
+    return allCreatedProjects;
   } catch (error) {
     console.error(`  ✗ Failed to create projects:`, error.message);
     throw error;
   }
+}
+
+async function attachImagesToRecentTasks(allProjects, userId) {
+  console.log('\n3️⃣  Attaching images to recent tasks...');
+  
+  // Get last 5 projects
+  const recentProjects = allProjects.slice(-5);
+  
+  let totalAttached = 0;
+  
+  for (const { project, tasks } of recentProjects) {
+    // Get last 5 tasks
+    const recentTasks = tasks.slice(-5);
+    
+    console.log(`\n  Project: ${project.title}`);
+    console.log(`    Attaching images to ${recentTasks.length} tasks...`);
+    
+    for (const task of recentTasks) {
+      const success = await uploadImageToTask(task.id, task.title, userId);
+      if (success) {
+        totalAttached++;
+        console.log(`      ✓ Attached image to: ${task.title}`);
+      }
+    }
+  }
+  
+  console.log(`\n  Total images attached: ${totalAttached}`);
 }
 
 async function main() {
@@ -219,7 +367,10 @@ async function main() {
   }
 
   try {
-    console.log('1️⃣  Registering sample users...');
+    console.log('1️⃣  Ensuring storage bucket exists...');
+    await ensureBucketExists();
+
+    console.log('\n2️⃣  Registering sample users...');
     console.log(
       `   Settings: ${options.projectsPerUser} projects/user, ${options.tasksPerProject} tasks/project, users=${selectedUsers
         .map((user) => user.email)
@@ -236,13 +387,24 @@ async function main() {
       }
     }
 
-    console.log('\n2️⃣  Creating projects, stages, and tasks...');
+    console.log('\n3️⃣  Creating projects, stages, and tasks...');
+
+    const allUserProjects = {};
 
     for (const email of Object.keys(userIds)) {
       const userId = userIds[email];
       console.log(`\n  User: ${email}`);
 
-      await createProjectsAndTasks(userId, options);
+      const projects = await createProjectsAndTasks(userId, options);
+      allUserProjects[email] = { userId, projects };
+    }
+
+    console.log('\n4️⃣  Attaching images to recent tasks...');
+
+    for (const email of Object.keys(allUserProjects)) {
+      const { userId, projects } = allUserProjects[email];
+      console.log(`\n  User: ${email}`);
+      await attachImagesToRecentTasks(projects, userId);
     }
 
     console.log('\n✅ Seeding complete!\n');

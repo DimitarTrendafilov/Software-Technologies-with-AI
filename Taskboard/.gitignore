@@ -6,3 +6,6 @@ dist/
 .supabase/
 supabase/.branches/
 supabase/.temp/
+
+# Keep images folder for seeding
+!images/
