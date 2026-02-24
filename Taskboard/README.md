@@ -32,6 +32,9 @@ supabase/
   schema.sql       # Baseline schema snapshot
 scripts/
   seed.mjs         # Seed script for sample users/projects/tasks
+  download-images.mjs              # Download thematic task images to /images
+  attach-scale-project-images.mjs  # Attach images to Scale Test Project 110-120
+  verify-scale-project-images.mjs  # Verify attachment counts for Scale Test Project 110-120
 ```
 
 ## Prerequisites
@@ -75,6 +78,12 @@ scripts/
 - `npm run db:push` - Push local migrations to linked remote project
 - `npm run db:pull` - Pull remote schema changes to local
 - `npm run db:sync` - Push, start, reset, and seed in one flow
+
+Image helper scripts (run directly):
+
+- `node scripts/download-images.mjs` - Download/refresh thematic task images in `images/`
+- `node scripts/attach-scale-project-images.mjs` - Replace and reattach images for `Scale Test Project 110` to `Scale Test Project 120`
+- `node scripts/verify-scale-project-images.mjs` - Verify attachment counts per target scale project
 
 ## Database & Supabase
 
@@ -177,9 +186,16 @@ Core relationships:
 
 When seeding with service role access, the script creates:
 
-- `steve@gmail.com` / `pass123`
-- `maria@gmail.com` / `pass123`
-- `peter@gmail.com` / `pass123`
+- `steve@gmail.com` / `123456`
+- `maria@gmail.com` / `123456`
+- `peter@gmail.com` / `123456`
+
+## Task Images Workflow
+
+- Task images are stored locally in `images/` and uploaded to Supabase Storage bucket `task-attachments` when attached to tasks.
+- Image selection is keyword-based by task title (requirements, design, development, testing, documentation, deployment, monitoring, performance, security).
+- Current scale-project attachment flow targets exactly `Scale Test Project 110` through `Scale Test Project 120`.
+- For each target project, the attach script clears previous task attachments for that project and then adds 5 new images distributed across different tasks/stages.
 
 ## Main Routes
 

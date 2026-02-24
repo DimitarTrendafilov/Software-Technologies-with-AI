@@ -13,7 +13,10 @@
     "db:push": "supabase db push",
     "db:pull": "supabase db pull",
     "db:sync": "supabase db push && supabase start && supabase db reset && node scripts/seed.mjs",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/seed.mjs",
+    "images:download": "node scripts/download-images.mjs",
+    "images:attach:scale": "node scripts/attach-scale-project-images.mjs",
+    "images:verify:scale": "node scripts/verify-scale-project-images.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
