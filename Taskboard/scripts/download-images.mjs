@@ -58,7 +58,8 @@ function downloadImage(url, filepath, attempt = 1) {
   return new Promise((resolve, reject) => {
     https.get(url, { headers: { 'User-Agent': 'Node.js' } }, (response) => {
       if (response.statusCode === 301 || response.statusCode === 302) {
-        downloadImage(response.headers.location, filepath, attempt).then(resolve).catch(reject);
+        const redirectUrl = new URL(response.headers.location, url).toString();
+        downloadImage(redirectUrl, filepath, attempt).then(resolve).catch(reject);
         return;
       }
       
